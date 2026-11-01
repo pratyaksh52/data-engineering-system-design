@@ -30,7 +30,13 @@ A complete, self-study course that prepares working data engineers for the **dat
 
 ## 3. Hard constraints
 
-1. **No reference, in any form, to the course whose structure this follows, its company, its website, or its author.** This applies to lesson text, file names, folder names, front matter, README, credits, comments, and this repo's docs. The structure in Section 5 is described here without attribution on purpose. The list of forbidden names is kept **outside this repo** (with the course owner, and in the assistant's project memory), so the repo itself never contains them. The constraint check in Section 8 is a case-insensitive search of the whole repo for those terms.
+1. **No reference, in any form, to the course whose structure this follows, its company, its website, or its author.** This applies to lesson text, file names, folder names, front matter, README, credits, comments, and this repo's docs. The structure in Section 5 is described here without attribution on purpose. The list of forbidden names lives in **`.forbidden-terms`** at the repo root, one case-insensitive regex per line. That file is listed in `.gitignore`, so it exists in the working folder but is never committed. The constraint check in Section 8 is:
+
+   ```bash
+   grep -rniE -f .forbidden-terms --exclude-dir=.git --exclude=.forbidden-terms .
+   ```
+
+   It must print nothing. If `.forbidden-terms` is missing (e.g. a fresh clone), stop and get the list from the course owner before writing or reviewing anything.
    - *(My call:)* to make this airtight, **the course cites no outside sources at all**: no courses, books, blogs, newsletters, talks or named people, and no "Going further" links to external sites. Vendor and open-source product names (Kafka, Snowflake, Debezium…) are fine, used as technology names.
 2. **All content is original.** Only the curriculum's shape (module and lesson topics and their order) was taken from the reference outline. No text, examples or diagrams were copied, because only titles were seen.
 3. **Style model: Hello Interview's system design course** (voice and explanation patterns, see Section 4). Copy its *approach*, never its text or examples. In particular, the ad-click aggregator breakdown must be our own design and narrative, not a retelling of theirs. *(My call:)* course content does not name Hello Interview either; the style reference lives only in this spec.
@@ -221,7 +227,7 @@ A lesson is not done when it's written. It's done when it has passed through the
 1. **Write:** the author drafts the lesson.
 2. **Clean-context verification:** a **fresh agent that did not write the lesson and has no memory of drafting it** (a new subagent given only this spec, the lesson file, and the files the lesson links to) checks the lesson against the quality bar above (checks 1–5) and the template for its type. It also checks technical accuracy. It **applies the fixes directly** to the lesson, then reports what it changed and anything it couldn't fix.
 3. **Humanizer pass:** the same clean-context agent (still not the author) runs the `/humanizer` skill on the lesson and **applies the suggested changes** to the file. Humanizer edits must not change technical meaning, numbers, Mermaid blocks, code, headings required by the template, or `<details>` structure. If a suggestion would, skip it and note it.
-4. **Final mechanical check:** after the humanizer edits, re-run the case-insensitive forbidden-terms search across the repo (zero hits required) and confirm every Mermaid block and relative link still matches what it was before step 3.
+4. **Final mechanical check:** after the humanizer edits, re-run the forbidden-terms check from Section 3 (zero hits required) and confirm every Mermaid block and relative link still matches what it was before step 3.
 
 The point of the clean context is that the reviewer reads the lesson the way a learner would, without the author's assumptions filling in gaps. The author does not review their own lesson.
 
