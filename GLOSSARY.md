@@ -14,6 +14,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Back-of-envelope estimate** — A quick, rounded calculation (events per second, TB per day, partitions needed) done aloud to see whether a design is feasible. Its job is to change a design decision, not to be precise. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
+**Bad → Good → Great** — A way to compare options for one design decision: a Bad option that fails a requirement, a Good one that works with known gaps, and a Great one that closes the gaps at a stated cost. Choose the level your requirements justify, not the highest. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
+
 **Below the line** — Explicitly out of scope. In the framework you list your requirements, draw a line under them, and write what you are deliberately not building beneath it. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
 
 ## C
@@ -36,11 +38,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## E
 
+**Dimension** — A table describing the things an event involved (customer, product, delivery slot). Dimensions are small and descriptive; you filter and group by their columns. Compare with fact table. See: [Data Model Design](01-the-framework/06-data-model-design.md)
+
 **Event time** — The moment an event actually happened, as recorded by the source (for example, when a user tapped "buy"). Compare with processing time. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 **Exactly-once** — The effect of processing each event once, with no loss and no duplicates. In practice it is built from at-least-once delivery plus idempotent writes or transactions, not from a network that never repeats itself. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 ## F
+
+**Fact table** — A table with one row per event at a chosen grain (an order line, a click), holding numeric measures to add up plus keys that point to dimensions. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 **Fan-out** — One input feeding many consumers or many downstream tasks, for example one Kafka topic read by five independent services. It multiplies reads, so plan capacity for the total, not for the single input. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
@@ -68,6 +74,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Medallion layers** — A way to organize a lakehouse into stages of increasing quality: bronze (raw as received), silver (cleaned and conformed) and gold (modeled for consumers). See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
 
+**Message log** — A durable, ordered, replayable queue of events (Kafka is the common one). Consumers read at their own pace and can re-read from an earlier point, which makes recovery and reprocessing possible. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
 ## N
 
 **Non-functional requirement (NFR)** — A measurable quality of how well a system does its job: freshness, completeness, correctness, retention, query speed, cost. It only counts as a requirement once it has a number. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
@@ -88,6 +96,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Rate limit** — A cap a pull API puts on how many requests you may make per minute. It sets how fast you can read or backfill history from that source, whatever your own cluster could do. See: [Sources and Volume](01-the-framework/04-sources-and-volume.md)
 
+**Raw layer** — The first stored copy of data, kept close to how it arrived (also called bronze). It lets you rerun cleaning logic after a bug without asking the source to resend. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
+
+**Read replica** — A copy of a database kept in sync with the primary and used for reading, so heavy extracts or CDC do not slow the live application. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
+
 **Retention** — How long data is kept before it is deleted or moved to cheaper storage, including any rule to delete a person's data on request. Raw volume times retention is the storage bill. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
 ## S
@@ -95,6 +107,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **SCD (slowly changing dimension)** — A technique for keeping a dimension table correct when its attributes change over time, such as a customer moving city. Type 1 overwrites the old value; Type 2 adds a new row with validity dates so history is preserved. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 **Schema evolution** — Changing a dataset's schema (adding, dropping, renaming or retyping columns) while existing data and readers keep working. Adding an optional column is usually safe; renaming or retyping often breaks consumers. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
+
+**Serving layer** — The final tables or stores that consumers read, kept small and shaped for their questions so internal changes do not break them. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **SLA / SLO** — An SLO (service level objective) is a target you set for a measurable quality, such as "the daily table is ready by 07:00 on 99% of days". An SLA (service level agreement) is an SLO that has been promised to someone and usually has consequences if it is missed. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
@@ -104,10 +118,14 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Source** — Any system a pipeline reads from but does not control: an operational database, an event stream, files, a pull API or a webhook. The type of source decides how the data can be read and how it can fail. See: [Sources and Volume](01-the-framework/04-sources-and-volume.md)
 
+**Star schema** — A model with one central fact table surrounded by dimension tables, joined at query time. It keeps each descriptive value in one place. See: [Data Model Design](01-the-framework/06-data-model-design.md)
+
 **Table format** — A metadata layer (Iceberg, Delta Lake, Hudi) that turns a pile of files in object storage into a table with transactions, schema changes and snapshots. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Throughput** — How much data a component moves per unit of time, such as MB/s per Kafka partition or events/s per pipeline. Compare with latency, which is how long one operation takes. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
 ## W
+
+**Wide table (OBT)** — A table that joins facts and dimensions ahead of time so every row carries all the columns a consumer needs and queries need no joins. Also called one big table. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 **Watermark** — A stream processor's running estimate of how far event time has progressed, which says "I don't expect events older than this anymore". It decides when a time window can be closed and its result emitted. Not the same as an ingestion "watermark column", which is the last value a batch load has already copied. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
