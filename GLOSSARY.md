@@ -38,6 +38,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Data contract** — An explicit, versioned agreement between a data producer and its consumers about a dataset's schema, meaning, quality and delivery expectations. Its purpose is to make breaking changes visible before they reach consumers. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
+**Data lineage** — A record of where data came from and what was built from it: which sources feed which tables, which jobs produced them and which dashboards and models read them. Walk it downstream for impact analysis and upstream for debugging. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
+
 **Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Deep dive** — A stretch of the interview where you go one level below the architecture diagram on a single topic, such as how to avoid double-counting after a replay. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
@@ -88,6 +90,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Message log** — A durable, ordered, replayable queue of events (Kafka is the common one). Consumers read at their own pace and can re-read from an earlier point, which makes recovery and reprocessing possible. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
+**Metadata catalog** — A searchable inventory of datasets with their schemas, owners and descriptions, often also storing the lineage graph. It is where people and tools look up what a table is and what depends on it. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
+
 ## N
 
 **Non-functional requirement (NFR)** — A measurable quality of how well a system does its job: freshness, completeness, correctness, retention, query speed, cost. It only counts as a requirement once it has a number. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
@@ -121,6 +125,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Read replica** — A copy of a database kept in sync with the primary and used for reading, so heavy extracts or CDC do not slow the live application. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Reconciliation** — Comparing your output with an independent source of truth (for example daily revenue against the payments provider's totals) and investigating any gap beyond a set tolerance. See: [Deep Dives](01-the-framework/08-deep-dives.md)
+
+**Replay** — Re-reading stored events (from a message log offset or the raw layer) and processing them again with the same or fixed logic. Safe only when the writes are idempotent. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
+
+**Reprocessing** — Running already-stored data through new or corrected logic, whether the trigger is a bug, a new rule or a new column. A backfill is its date-range form. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
 
 **Retention** — How long data is kept before it is deleted or moved to cheaper storage, including any rule to delete a person's data on request. Raw volume times retention is the storage bill. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
