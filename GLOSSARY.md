@@ -54,6 +54,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Data lineage** — A record of where data came from and what was built from it: which sources feed which tables, which jobs produced them and which dashboards and models read them. Walk it downstream for impact analysis and upstream for debugging. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
 
+**Data mesh** — An organisational pattern where domain teams own their analytical data as products, a self-serve platform makes that cheap, and federated governance keeps the products combinable. Worth it only with many domains and a bottlenecked central team. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
+
+**Data product** — A dataset published by a domain team as a product: a named owner, a contract, a catalog entry and a service level, for consumers who can rely on it. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
+
 **Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Dedup key** — The column or columns that identify one real-world event, so two records with the same key count as one. Best created at the source before any retry. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
@@ -81,6 +85,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## F
 
 **Expand and contract** — A way to ship a breaking change safely: add the new field or version beside the old one, migrate every consumer, then remove the old one. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
+
+**Federated governance** — Shared rules (identifier formats, privacy classes, contract standards) agreed by domain representatives and the platform team, and enforced automatically by the platform so data from different domains can be joined. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Fact table** — A table with one row per event at a chosen grain (an order line, a click), holding numeric measures to add up plus keys that point to dimensions. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
@@ -189,6 +195,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Schema registry** — A service that stores every version of each schema and rejects a new version that violates the configured compatibility mode. Producers and consumers look schemas up from it instead of hard-coding them. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
 **Speed layer** — The streaming half of a Lambda design: it computes approximate results for the recent past, until the batch layer's exact result replaces them. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
+
+**Self-serve data platform** — Shared tooling run by a platform team (storage, templates, catalog, access control, observability) that lets a domain team publish a data product without being an infrastructure expert. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Serving layer** — The final tables or stores that consumers read, kept small and shaped for their questions so internal changes do not break them. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
