@@ -32,7 +32,11 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## D
 
+**DAG (directed acyclic graph)** — The set of tasks in a pipeline with arrows meaning "must finish before" and no loops. An orchestrator runs it and tracks which tasks succeeded. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
+
 **Data contract** — An explicit, versioned agreement between a data producer and its consumers about a dataset's schema, meaning, quality and delivery expectations. Its purpose is to make breaking changes visible before they reach consumers. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
+
+**Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Deep dive** — A stretch of the interview where you go one level below the architecture diagram on a single topic, such as how to avoid double-counting after a replay. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
 
@@ -86,9 +90,13 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **OLAP (online analytical processing)** — Workloads that scan and aggregate large amounts of data to answer questions, such as "revenue by region by month". Column-oriented warehouses are built for it. Compare with OLTP, which handles many small reads and writes to individual rows. See: [Snowflake and Cloud Warehouses](04-technology-deep-dives/05-snowflake.md)
 
+**Orchestrator** — The tool (Airflow, Dagster, Prefect and similar) that runs a DAG of tasks, waits on dependencies, retries failures and records what ran. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
+
 ## P
 
 **Partition** — A slice of a dataset or stream, chosen by a key or a range, that can be stored and processed independently. Partitions are how data systems spread work across machines and skip data they don't need. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Partition overwrite** — Making a run replace exactly one partition of the output (for example one date) instead of appending to it, so a rerun gives the same result. The default idempotent write for dated batch outputs. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Processing time** — The moment a system handles an event, as opposed to when it happened. Processing time is almost always later than event time, and the gap is what makes late data possible. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
@@ -123,6 +131,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Table format** — A metadata layer (Iceberg, Delta Lake, Hudi) that turns a pile of files in object storage into a table with transactions, schema changes and snapshots. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Throughput** — How much data a component moves per unit of time, such as MB/s per Kafka partition or events/s per pipeline. Compare with latency, which is how long one operation takes. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
+
+## U
+
+**Upsert (MERGE)** — Writing a row if its key is new and updating it if the key already exists. Applying the same batch twice changes nothing, which makes it an idempotent write for tables of entities. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 ## W
 
