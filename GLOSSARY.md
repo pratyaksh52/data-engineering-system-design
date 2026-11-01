@@ -152,6 +152,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Hot partition** — A partition that receives far more traffic or data than the others, usually because the partition key is skewed (one huge customer, one viral item). It becomes the bottleneck for the whole system. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
+**Hot, warm and cold tiers** — Storing data at different price and speed points by age: the newest, most-read data on fast, expensive storage (a search index on SSD), older data on cheaper, slower storage (object storage, then an archive tier). Per-use retention requirements set the boundaries. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
+
 ## I
 
 **Idempotent** — An operation that gives the same end result whether it runs once or many times. Idempotent pipeline steps can be retried or replayed safely. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
@@ -163,6 +165,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Incremental model** — A dbt model that keeps its table between runs and processes only new or changed rows, writing them in with an incremental strategy (append, merge, delete+insert, insert_overwrite or microbatch). Cheaper than a rebuild, but it can drift and miss hard deletes. See: [dbt](04-technology-deep-dives/04-dbt.md)
 
 **Incremental snapshot** — A Debezium snapshot that reads a table in primary-key chunks while streaming continues, using watermark markers in the log to drop chunk rows that changed meanwhile. It lets you backfill one table without a lock or a full restart. See: [Debezium and CDC Tools](04-technology-deep-dives/09-debezium-and-cdc-tools.md)
+
+**Inverted index** — A map from every word to the list of documents that contain it, like the index at the back of a book. It lets a search engine find any word in seconds, at a storage cost close to the size of the raw text. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
 ## K
 
@@ -183,6 +187,12 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Late-arriving dimension** — A fact that references a dimension row (for example a customer) which has not been loaded yet. Handle it with an inferred placeholder member or a quarantine-and-retry table, not a join that silently drops the fact. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 **Liquid clustering** — A Delta Lake layout feature (`CLUSTER BY`) that clusters data incrementally on chosen keys and lets you change the keys later without rewriting the table; it replaces partitioning and Z-order on new tables. Availability is version-dependent. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
+**Log agent** — A small program on every host (Fluent Bit, Vector, the OpenTelemetry Collector) that tails log files and container output, adds metadata, buffers to local disk and ships lines on, so services never block on logging. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
+
+**Log sampling** — Keeping a representative fraction of repetitive log lines (say 1 in 20 INFO lines from one service) plus a count of what was skipped, while never sampling errors. It caps volume without hiding the shape of what happened. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
+
+**Logs-to-metrics** — Counting log lines as they flow past (per service, level and minute) and storing the counts, so trends and alerts read a tiny table instead of scanning raw logs. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
 ## M
 
@@ -282,6 +292,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Schema registry** — A service that stores every version of each schema and rejects a new version that violates the configured compatibility mode. Producers and consumers look schemas up from it instead of hard-coding them. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
+**Showback** — Reporting each team its own share of a shared platform's cost (for example GB of logs per service per day, priced), without billing them. It reduces volume because teams find their own waste. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
+
 **Shuffle** — Redistributing data across a cluster so rows with the same key land together; it writes to disk and crosses the network, so it is the costliest step in a Spark job and the boundary between stages. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
 **Speed layer** — The streaming half of a Lambda design: it computes approximate results for the recent past, until the batch layer's exact result replaces them. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
@@ -316,6 +328,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Star schema** — A model with one central fact table surrounded by dimension tables, joined at query time. It keeps each descriptive value in one place. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
+**Structured logging** — Writing each log line as a record with named fields (usually JSON) instead of free text, so it parses cheaply and reliably and sensitive fields can be dropped by name. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
+
 **Table format** — A metadata layer (Iceberg, Delta Lake, Hudi) that turns a pile of files in object storage into a table with transactions, schema changes and snapshots. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Task-centric orchestration** — An orchestrator model (Airflow's, Prefect's) where each node is a unit of work and you define the order between steps; the datasets they change are implicit unless you add metadata. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
@@ -323,6 +337,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Throughput** — How much data a component moves per unit of time, such as MB/s per Kafka partition or events/s per pipeline. Compare with latency, which is how long one operation takes. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
 **Topic** — A named stream of messages in Kafka, split into partitions. Producers append to it and consumer groups read from it. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
+**Trace ID** — An identifier attached to one user request as it passes through many services, so every log line that request produced can be pulled together. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
 **Transaction log** — In Delta Lake, the ordered `_delta_log` of JSON commits (plus periodic checkpoints) listing which data files are added and removed; replaying it defines the table. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
