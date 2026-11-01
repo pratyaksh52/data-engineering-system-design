@@ -60,6 +60,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Freshness** — How old the newest data in a table or dashboard is compared with now, for example "no more than 15 minutes behind the source". One of the three common data SLAs, next to completeness and quality. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
+**Full load** — Reading the whole source on every run and replacing your copy. Simple and handles deletes for free, but the work grows with the table. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
+
 **Functional requirement** — Something the system must produce or do, stated from the consumer's side, such as "marketing sees conversions per campaign". In a data system it is usually an output table, metric or feed. Compare with non-functional requirement. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
 ## G
@@ -73,6 +75,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## I
 
 **Idempotent** — An operation that gives the same end result whether it runs once or many times. Idempotent pipeline steps can be retried or replayed safely. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
+
+**Incremental load** — Reading only the rows that are new or changed since the last run, usually with a watermark column. Cheaper per run than a full load, but it misses hard deletes unless handled. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
 
 ## L
 
@@ -157,3 +161,6 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Wide table (OBT)** — A table that joins facts and dimensions ahead of time so every row carries all the columns a consumer needs and queries need no joins. Also called one big table. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 **Watermark** — A stream processor's running estimate of how far event time has progressed, which says "I don't expect events older than this anymore". It decides when a time window can be closed and its result emitted. Not the same as an ingestion "watermark column", which is the last value a batch load has already copied. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
+
+
+**Watermark column** — A column that only moves forward (usually `updated_at`) whose largest loaded value is stored, so the next incremental run asks only for rows beyond it. Misses hard deletes and late commits unless you add an overlap window. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
