@@ -42,6 +42,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Completeness** — The share of the data you expected that has actually arrived, for example "99.9% of yesterday's events are loaded". One of the three common data SLAs, next to freshness and quality. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
+**Conformed** — Made consistent across sources: the same currency format, UTC timestamps and one customer ID wherever the concept appears. It is the main job of the silver layer. See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
+
 **Consumer** — Whoever reads the output of a data system: an analyst, a dashboard, an ML model or another team's pipeline. A data design is judged by how well it serves its consumers. See: [How Interviews Work](01-the-framework/01-how-interviews-work.md)
 
 ## D
@@ -145,6 +147,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Partition pruning** — The engine dropping every partition that cannot match a query's filter before reading any data. It only works when the filter is on the partition column itself, not a function of it. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 **Processing time** — The moment a system handles an event, as opposed to when it happened. Processing time is almost always later than event time, and the gap is what makes late data possible. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
+
+## Q
+
+**Quarantine table** — A side table that holds records which failed validation, with the reason attached, so bad rows are visible and fixable instead of silently dropped. See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
 
 ## R
 
