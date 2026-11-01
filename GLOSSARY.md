@@ -30,6 +30,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **CDC (change data capture)** — Reading a database's change log (inserts, updates and deletes) and streaming those changes to other systems, instead of repeatedly querying the tables. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
+**Checkpoint** — Durable storage where a streaming job records its progress (source offsets and operator state), so a restart resumes from the last good point instead of starting over. See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
+
 **Clustering** — Ordering rows inside each partition by another column (also called sorting) so that queries filtering on it can skip blocks using min/max statistics. It is the fine cut after partitioning's coarse one, and it decays as unsorted data arrives. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 **Columnar format** — A file format (such as Parquet) that stores each column's values together instead of one row at a time. It compresses well and lets a query read only the columns it needs. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
@@ -134,6 +136,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Message log** — A durable, ordered, replayable queue of events (Kafka is the common one). Consumers read at their own pace and can re-read from an earlier point, which makes recovery and reprocessing possible. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
+**Micro-batch** — Processing a stream as a series of small batch jobs, one every few seconds or minutes, each picking up where the last stopped. Trades a latency floor for simplicity and easy recovery. See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
+
 **Metadata catalog** — A searchable inventory of datasets with their schemas, owners and descriptions, often also storing the lineage graph. It is where people and tools look up what a table is and what depends on it. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
 
 ## N
@@ -223,6 +227,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Table format** — A metadata layer (Iceberg, Delta Lake, Hudi) that turns a pile of files in object storage into a table with transactions, schema changes and snapshots. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Throughput** — How much data a component moves per unit of time, such as MB/s per Kafka partition or events/s per pipeline. Compare with latency, which is how long one operation takes. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
+
+**Trigger** — In Spark Structured Streaming, the setting that decides when the next micro-batch starts (as soon as possible, every N minutes, or once for everything available and then stop). See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
 
 **Tiered storage** — A message-log feature that offloads older segments to object storage and reads them back on demand, so replay can reach further back than broker disks allow, at slower read speed. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
 
