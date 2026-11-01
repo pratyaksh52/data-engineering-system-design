@@ -64,6 +64,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Consumer lag** — For a Kafka partition, the latest offset minus the group's committed offset: how far behind the consumers are. Rising lag is the main health signal of a streaming pipeline. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
+**Copy-on-write** — Handling an update or delete by rewriting every data file that holds an affected row, so reads stay plain and fast but writes are expensive. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
+
 **Credit** — Snowflake's billing unit for compute: the smallest virtual warehouse burns 1 credit per running hour and each size up doubles it, at roughly $2 to 4 per credit. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
 ## D
@@ -138,6 +140,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## H
 
+**Hidden partitioning** — Iceberg partitioning by a transform of a real column (such as `days(event_ts)`), so users filter on the real column and still get pruning, with no derived partition column to remember. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
+
 **Hot partition** — A partition that receives far more traffic or data than the others, usually because the partition key is skewed (one huge customer, one viral item). It becomes the bottleneck for the whole system. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 ## I
@@ -168,9 +172,13 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## M
 
+**Manifest** — In Iceberg, a metadata file listing data files with their partition values, row counts and per-column min/max bounds, so a query can skip files without opening them. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
+
 **Materialization** — In dbt, how a model's query result is stored: as a view, a table, an incremental table, or a warehouse-maintained materialized view. Choosing it is a cost and freshness decision. See: [dbt](04-technology-deep-dives/04-dbt.md)
 
 **Medallion layers** — A way to organize a lakehouse into stages of increasing quality: bronze (raw as received), silver (cleaned and conformed) and gold (modeled for consumers). See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
+
+**Merge-on-read** — Handling an update or delete by writing a small delete file beside the untouched data file, so writes are cheap and readers apply the deletes until compaction. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Message log** — A durable, ordered, replayable queue of events (Kafka is the common one). Consumers read at their own pace and can re-read from an earlier point, which makes recovery and reprocessing possible. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
@@ -204,6 +212,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Partition** — A slice of a dataset or stream, chosen by a key or a range, that can be stored and processed independently. Partitions are how data systems spread work across machines and skip data they don't need. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
+**Partition evolution** — Changing a table's partitioning as a metadata-only change: old files keep their old layout, new writes use the new one. An Iceberg feature. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
+
 **Partition overwrite** — Making a run replace exactly one partition of the output (for example one date) instead of appending to it, so a rerun gives the same result. The default idempotent write for dated batch outputs. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Partition pruning** — The engine dropping every partition that cannot match a query's filter before reading any data. It only works when the filter is on the partition column itself, not a function of it. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -233,6 +243,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Replication slot** — A bookmark in a database such as Postgres that makes it keep its change log until a CDC reader confirms it has consumed it. A stopped reader makes the log pile up and can fill the source's disk, so alert on slot lag. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
 **Reprocessing** — Running already-stored data through new or corrected logic, whether the trigger is a bug, a new rule or a new column. A backfill is its date-range form. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
+
+**REST catalog** — An open HTTP API for table catalogs that any engine can speak, giving engine-neutral access, server-side commits and centrally vended storage credentials. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Retention** — How long data is kept before it is deleted or moved to cheaper storage, including any rule to delete a person's data on request. Raw volume times retention is the storage bill. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
