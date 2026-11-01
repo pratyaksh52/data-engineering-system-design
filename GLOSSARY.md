@@ -6,6 +6,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Access pattern** — How a dataset will be read: which queries, by whom, how often, scanning a lot or looking up a little. It decides table layout and the serving store. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
+**Alert fatigue** — What happens when a team gets so many alerts that it stops acting on them, including the real ones. Measure it by checking how many of the last 30 pages needed a human. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
+
+**Anomaly detection** — Automatically flagging a value that differs from its usual pattern, in its simplest useful form a same-weekday baseline with a tolerance. Reserve it for a few high-value metrics, because every threshold on a noisy number produces some false alarms. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
+
 **At-least-once** — A delivery guarantee where every event is delivered one or more times, so nothing is lost but duplicates can happen. Pair it with an idempotent write or a deduplication step to get correct results. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 ## B
@@ -135,6 +139,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Reprocessing** — Running already-stored data through new or corrected logic, whether the trigger is a bug, a new rule or a new column. A backfill is its date-range form. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
 
 **Retention** — How long data is kept before it is deleted or moved to cheaper storage, including any rule to delete a person's data on request. Raw volume times retention is the storage bill. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
+
+**Runbook** — A short document tied to one alert: what it means, how to confirm it, likely causes, fixes and who to escalate to. It lets a tired on-call engineer act without reading code. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
 ## S
 
