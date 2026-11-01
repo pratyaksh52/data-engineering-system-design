@@ -140,6 +140,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Incremental load** — Reading only the rows that are new or changed since the last run, usually with a watermark column. Cheaper per run than a full load, but it misses hard deletes unless handled. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
 
+**Incremental model** — A dbt model that keeps its table between runs and processes only new or changed rows, writing them in with an incremental strategy (append, merge, delete+insert, insert_overwrite or microbatch). Cheaper than a rebuild, but it can drift and miss hard deletes. See: [dbt](04-technology-deep-dives/04-dbt.md)
+
 ## K
 
 **Kappa architecture** — One streaming pipeline over a replayable message log, with no batch layer; to fix history you replay the log through a new version of the job into a separate output and then switch consumers. Limited by log retention and replay cost. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
@@ -155,6 +157,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Late-arriving dimension** — A fact that references a dimension row (for example a customer) which has not been loaded yet. Handle it with an inferred placeholder member or a quarantine-and-retry table, not a join that silently drops the fact. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 ## M
+
+**Materialization** — In dbt, how a model's query result is stored: as a view, a table, an incremental table, or a warehouse-maintained materialized view. Choosing it is a cost and freshness decision. See: [dbt](04-technology-deep-dives/04-dbt.md)
 
 **Medallion layers** — A way to organize a lakehouse into stages of increasing quality: bronze (raw as received), silver (cleaned and conformed) and gold (modeled for consumers). See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
 
@@ -245,6 +249,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Skew** — Uneven load across partitions or workers, such as one city producing a third of the orders, so one slow task decides how long the whole job takes. Fix it with a different or compound key. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 **SLA / SLO** — An SLO (service level objective) is a target you set for a measurable quality, such as "the daily table is ready by 07:00 on 99% of days". An SLA (service level agreement) is an SLO that has been promised to someone and usually has consequences if it is missed. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
+
+**Snapshot (dbt)** — A dbt feature that builds an SCD Type 2 table by comparing a mutable source to its own previous state on every run. It records only the changes it observes, so run frequency sets the history's resolution. See: [dbt](04-technology-deep-dives/04-dbt.md)
 
 **Spill** — A task writing intermediate data to local disk because it ran out of execution memory. The job still finishes, slowly. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
