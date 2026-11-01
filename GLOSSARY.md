@@ -14,6 +14,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Anomaly detection** — Automatically flagging a value that differs from its usual pattern, in its simplest useful form a same-weekday baseline with a tolerance. Reserve it for a few high-value metrics, because every threshold on a noisy number produces some false alarms. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
+**Asset-centric orchestration** — An orchestrator model (Dagster's) where each node is a dataset that should exist plus the function that builds it, so lineage, freshness and partitioned backfills attach to data. Contrast task-centric tools (Airflow, Prefect), where a node is a step. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
+
 **Asset (Airflow)** — A logical dataset that an Airflow task declares it updates; other DAGs can schedule on it instead of on a clock (data-aware scheduling). Called a dataset before Airflow 3. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **At-least-once** — A delivery guarantee where every event is delivered one or more times, so nothing is lost but duplicates can happen. Pair it with an idempotent write or a deduplication step to get correct results. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
@@ -90,6 +92,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Data virtualization** — Querying data in place across several systems through one SQL interface (a federated query) instead of copying it first. Good for exploration and light joins; heavy or frequent joins should be materialised. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
 
+**Debezium** — An open-source set of CDC connectors that read a database's transaction log and publish one change event per row change, usually through Kafka Connect. See: [Debezium and CDC Tools](04-technology-deep-dives/09-debezium-and-cdc-tools.md)
+
 **Deferrable operator** — An Airflow operator or sensor that hands its waiting to a single async process (the triggerer) so it holds no worker slot while it waits. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
@@ -158,7 +162,11 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Incremental model** — A dbt model that keeps its table between runs and processes only new or changed rows, writing them in with an incremental strategy (append, merge, delete+insert, insert_overwrite or microbatch). Cheaper than a rebuild, but it can drift and miss hard deletes. See: [dbt](04-technology-deep-dives/04-dbt.md)
 
+**Incremental snapshot** — A Debezium snapshot that reads a table in primary-key chunks while streaming continues, using watermark markers in the log to drop chunk rows that changed meanwhile. It lets you backfill one table without a lock or a full restart. See: [Debezium and CDC Tools](04-technology-deep-dives/09-debezium-and-cdc-tools.md)
+
 ## K
+
+**Kafka Connect** — The framework that runs source and sink connectors for Kafka as a cluster of workers, configured through a REST API and tracking progress in Kafka topics. Debezium runs on it. See: [Debezium and CDC Tools](04-technology-deep-dives/09-debezium-and-cdc-tools.md)
 
 **Kappa architecture** — One streaming pipeline over a replayable message log, with no batch layer; to fix history you replay the log through a new version of the job into a separate output and then switch consumers. Limited by log retention and replay cost. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
 
@@ -262,6 +270,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Savepoint** — A manually triggered, portable snapshot of a Flink job's state, used for upgrades, rescaling and migrations. Unlike a checkpoint, you own it and it is not auto-deleted. See: [Flink](04-technology-deep-dives/08-flink.md)
 
+**Schema history topic** — A single-partition, infinite-retention Kafka topic where connectors such as Debezium MySQL record every DDL statement, so they can decode old log entries with the table structure of that moment. Losing it breaks the connector. See: [Debezium and CDC Tools](04-technology-deep-dives/09-debezium-and-cdc-tools.md)
+
 **Sensor** — An orchestrator task whose only job is to wait for a condition, such as a file landing or a partition appearing, before downstream tasks run. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Salting** — Adding a small random suffix to a hot key so its records spread over several partitions. Readers must then merge those slices, and ordering across them is lost. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -300,11 +310,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## T
 
+**Software-defined asset** — Dagster's unit: a decorated Python function that declares the one named dataset it produces and which assets it reads, so dependencies come from its inputs. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
+
 **Source** — Any system a pipeline reads from but does not control: an operational database, an event stream, files, a pull API or a webhook. The type of source decides how the data can be read and how it can fail. See: [Sources and Volume](01-the-framework/04-sources-and-volume.md)
 
 **Star schema** — A model with one central fact table surrounded by dimension tables, joined at query time. It keeps each descriptive value in one place. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 **Table format** — A metadata layer (Iceberg, Delta Lake, Hudi) that turns a pile of files in object storage into a table with transactions, schema changes and snapshots. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
+
+**Task-centric orchestration** — An orchestrator model (Airflow's, Prefect's) where each node is a unit of work and you define the order between steps; the datasets they change are implicit unless you add metadata. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
 
 **Throughput** — How much data a component moves per unit of time, such as MB/s per Kafka partition or events/s per pipeline. Compare with latency, which is how long one operation takes. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
@@ -343,5 +357,7 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Watermark column** — A column that only moves forward (usually `updated_at`) whose largest loaded value is stored, so the next incremental run asks only for rows beyond it. Misses hard deletes and late commits unless you add an overlap window. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
 **Windowed dedup** — Streaming deduplication that remembers each key for a fixed period and then forgets it. State stays bounded, but duplicates arriving after the window pass through. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
+**Workflow service (cloud-native)** — A managed state-machine or pipeline service from a cloud (for example Step Functions, Cloud Workflows, Data Factory) that calls other services with nothing to host. Strong for glue between services, weak at dated backfills and lineage. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
 
 **Write-ahead log (WAL)** — The file where a database records every change before applying it, so it can recover after a crash and feed replicas. Log-based CDC reads it (Postgres: WAL, MySQL: binlog). See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
