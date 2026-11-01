@@ -40,6 +40,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **CDC (change data capture)** — Reading a database's change log (inserts, updates and deletes) and streaming those changes to other systems, instead of repeatedly querying the tables. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
+**Change data feed (CDF)** — A Delta Lake option that records row-level changes (insert, update before and after, delete) on each write and exposes them for reading, so downstream jobs process only what changed. It starts from the version where it was enabled. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
 **Checkpoint** — Durable storage where a streaming job records its progress (source offsets and operator state), so a restart resumes from the last good point instead of starting over. See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
 
 **Clustering** — Ordering rows inside each partition by another column (also called sorting) so that queries filtering on it can skip blocks using min/max statistics. It is the fine cut after partitioning's coarse one, and it decays as unsorted data arrives. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -91,6 +93,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Deduplication (dedup)** — Collapsing records that describe the same real-world event into one. In batch it is a window function or MERGE; in a stream it needs state sized by window length times event rate. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 **Deep dive** — A stretch of the interview where you go one level below the architecture diagram on a single topic, such as how to avoid double-counting after a replay. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
+
+**Deletion vector** — In Delta Lake, a small side file marking rows of a data file as deleted, so DELETE, UPDATE and MERGE avoid rewriting the whole file; a later OPTIMIZE purges the marked rows. Availability is version-dependent. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
+**Delta Lake** — An open table format that adds a transaction log beside Parquet files in object storage, giving atomic commits, versions, schema enforcement and row-level updates. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 ## E
 
@@ -158,6 +164,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Late-arriving dimension** — A fact that references a dimension row (for example a customer) which has not been loaded yet. Handle it with an inferred placeholder member or a quarantine-and-retry table, not a join that silently drops the fact. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
+**Liquid clustering** — A Delta Lake layout feature (`CLUSTER BY`) that clusters data incrementally on chosen keys and lets you change the keys later without rewriting the table; it replaces partitioning and Z-order on new tables. Availability is version-dependent. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
 ## M
 
 **Materialization** — In dbt, how a model's query result is stored: as a view, a table, an incremental table, or a warehouse-maintained materialized view. Choosing it is a cost and freshness decision. See: [dbt](04-technology-deep-dives/04-dbt.md)
@@ -185,6 +193,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Offset** — The sequential number of a message within a Kafka partition; its address in that log. A consumer's progress is the offset it has read up to. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **OLAP (online analytical processing)** — Workloads that scan and aggregate large amounts of data to answer questions, such as "revenue by region by month". Column-oriented warehouses are built for it. Compare with OLTP, which handles many small reads and writes to individual rows. See: [Snowflake and Cloud Warehouses](04-technology-deep-dives/05-snowflake.md)
+
+**Optimistic concurrency control** — Letting writers work without locks and checking for conflicts only at commit time; a writer retries if the winning commit touched nothing it read, and fails if it did. Delta Lake uses it. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Orchestrator** — The tool (Airflow, Dagster, Prefect and similar) that runs a DAG of tasks, waits on dependencies, retries failures and records what ran. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
@@ -278,7 +288,11 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Topic** — A named stream of messages in Kafka, split into partitions. Producers append to it and consumer groups read from it. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
+**Transaction log** — In Delta Lake, the ordered `_delta_log` of JSON commits (plus periodic checkpoints) listing which data files are added and removed; replaying it defines the table. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
 **Trigger** — In Spark Structured Streaming, the setting that decides when the next micro-batch starts (as soon as possible, every N minutes, or once for everything available and then stop). See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
+
+**Time travel** — Reading a table as of an earlier version or timestamp, possible while the old log entries and data files still exist (about 7 days by default in Delta Lake). See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Tiered storage** — A message-log feature that offloads older segments to object storage and reads them back on demand, so replay can reach further back than broker disks allow, at slower read speed. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
 
@@ -291,6 +305,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Z-order** — A layout that interleaves the sort order of several columns so rows close in all of them sit near each other, giving moderate data skipping on any of those columns. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 ## V
+
+**VACUUM** — The Delta Lake command that physically deletes data files no longer referenced by the current version and older than the retention period (7 days by default). It ends time travel to the deleted versions. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Virtual warehouse** — In Snowflake, a rented compute cluster that runs queries over shared storage; many can read the same tables without competing. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
