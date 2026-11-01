@@ -62,6 +62,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Consumer lag** — For a Kafka partition, the latest offset minus the group's committed offset: how far behind the consumers are. Rising lag is the main health signal of a streaming pipeline. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
+**Credit** — Snowflake's billing unit for compute: the smallest virtual warehouse burns 1 credit per running hour and each size up doubles it, at roughly $2 to 4 per credit. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
+
 ## D
 
 **DAG (directed acyclic graph)** — The set of tasks in a pipeline with arrows meaning "must finish before" and no loops. An orchestrator runs it and tracks which tasks succeeded. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
@@ -165,6 +167,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Message log** — A durable, ordered, replayable queue of events (Kafka is the common one). Consumers read at their own pace and can re-read from an earlier point, which makes recovery and reprocessing possible. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Micro-batch** — Processing a stream as a series of small batch jobs, one every few seconds or minutes, each picking up where the last stopped. Trades a latency floor for simplicity and easy recovery. See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
+
+**Micro-partition** — Snowflake's automatic, immutable columnar file holding tens to hundreds of MB of rows, with min/max statistics per column that let queries skip it. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
 **Metadata catalog** — A searchable inventory of datasets with their schemas, owners and descriptions, often also storing the lineage graph. It is where people and tools look up what a table is and what depends on it. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
 
@@ -285,6 +289,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Upsert (MERGE)** — Writing a row if its key is new and updating it if the key already exists. Applying the same batch twice changes nothing, which makes it an idempotent write for tables of entities. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Z-order** — A layout that interleaves the sort order of several columns so rows close in all of them sit near each other, giving moderate data skipping on any of those columns. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+## V
+
+**Virtual warehouse** — In Snowflake, a rented compute cluster that runs queries over shared storage; many can read the same tables without competing. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
 ## W
 
