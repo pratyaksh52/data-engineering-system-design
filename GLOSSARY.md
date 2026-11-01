@@ -26,6 +26,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Columnar format** — A file format (such as Parquet) that stores each column's values together instead of one row at a time. It compresses well and lets a query read only the columns it needs. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
+**Column pruning** — Reading only the columns a query names, which a columnar format makes possible because each column is stored separately. `SELECT *` defeats it. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
+
 **Compaction** — Rewriting many small files into fewer, larger ones so queries open fewer files. Table formats such as Iceberg and Delta Lake provide it as a maintenance operation that you schedule, or that a managed service runs for you. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Completeness** — The share of the data you expected that has actually arrived, for example "99.9% of yesterday's events are loaded". One of the three common data SLAs, next to freshness and quality. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
@@ -49,6 +51,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Dimension** — A table describing the things an event involved (customer, product, delivery slot). Dimensions are small and descriptive; you filter and group by their columns. Compare with fact table. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 **Error budget** — The amount of failure an SLO allows: a 99% target over 365 days permits about 3 to 4 misses a year. Once it is spent, you pause risky changes and fix reliability. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
+
+**Egress** — Data leaving a cloud provider, region or zone, billed per GB (about $0.05 to 0.09 for internet egress, about $0.01 across zones). It is invisible in a diagram and obvious on the bill. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
 
 **Event time** — The moment an event actually happened, as recorded by the source (for example, when a user tapped "buy"). Compare with processing time. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
@@ -146,7 +150,11 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **SLA / SLO** — An SLO (service level objective) is a target you set for a measurable quality, such as "the daily table is ready by 07:00 on 99% of days". An SLA (service level agreement) is an SLO that has been promised to someone and usually has consequences if it is missed. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
+**Spot capacity** — Spare cloud machines sold at a large discount (often 60 to 70 percent) that the cloud can reclaim at short notice. Suits retryable batch jobs, not state you cannot rebuild. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
+
 **Small-files problem** — Too many tiny files in storage (often from frequent streaming writes), which makes listing and opening them dominate query time. The fix is to write bigger files or run compaction. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Storage tier** — A price and speed class of object storage: standard is instant and costs more, archive is much cheaper per TB but slow or fee-bearing to read. Lifecycle rules move data between tiers by age. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
 
 ## T
 
