@@ -52,11 +52,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Data contract** — An explicit, versioned agreement between a data producer and its consumers about a dataset's schema, meaning, quality and delivery expectations. Its purpose is to make breaking changes visible before they reach consumers. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
+**Data fabric** — A metadata-driven layer across existing data systems that gives one place to discover, understand, access and govern data where it lives. Its parts (catalog, automated lineage, federated query, central policy) are useful; the name is largely vendor packaging. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
+
 **Data lineage** — A record of where data came from and what was built from it: which sources feed which tables, which jobs produced them and which dashboards and models read them. Walk it downstream for impact analysis and upstream for debugging. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
 
 **Data mesh** — An organisational pattern where domain teams own their analytical data as products, a self-serve platform makes that cheap, and federated governance keeps the products combinable. Worth it only with many domains and a bottlenecked central team. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Data product** — A dataset published by a domain team as a product: a named owner, a contract, a catalog entry and a service level, for consumers who can rely on it. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
+
+**Data virtualization** — Querying data in place across several systems through one SQL interface (a federated query) instead of copying it first. Good for exploration and light joins; heavy or frequent joins should be materialised. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
 
 **Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
