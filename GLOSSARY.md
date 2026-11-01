@@ -6,6 +6,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Access pattern** — How a dataset will be read: which queries, by whom, how often, scanning a lot or looking up a little. It decides table layout and the serving store. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
+**Accumulating snapshot** — A fact table with one row per item moving through a fixed process (an order line from paid to shipped to delivered) and one timestamp column per milestone, filled in as each happens. It is the fact table you update in place. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
+
 **Adaptive query execution (AQE)** — Spark's runtime re-optimization, on by default since 3.2: it uses real shuffle sizes to merge small partitions, switch a join to broadcast, and split skewed join partitions. It does not fix a skewed group-by. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
 **Alert fatigue** — What happens when a team gets so many alerts that it stops acting on them, including the real ones. Measure it by checking how many of the last 30 pages needed a human. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
@@ -37,6 +39,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Broker** — A server in a Kafka cluster that stores partitions and serves producers and consumers. A cluster is several brokers, so a partition can be copied to more than one. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
+**Bus matrix** — A grid of which fact tables use which dimensions. It shows at a glance which dimensions must be conformed so numbers from different facts line up. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
+
 
 ## C
 
@@ -63,6 +67,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Completeness** — The share of the data you expected that has actually arrived, for example "99.9% of yesterday's events are loaded". One of the three common data SLAs, next to freshness and quality. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
 **Conformed** — Made consistent across sources: the same currency format, UTC timestamps and one customer ID wherever the concept appears. It is the main job of the silver layer. See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
+
+**Conformed dimension** — A dimension table shared, with the same keys and meanings, by several fact tables, so "category" means the same thing for sales, returns and deliveries. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
 
 **Consumer** — Whoever reads the output of a data system: an analyst, a dashboard, an ML model or another team's pipeline. A data design is judged by how well it serves its consumers. See: [How Interviews Work](01-the-framework/01-how-interviews-work.md)
 
@@ -106,6 +112,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Deep dive** — A stretch of the interview where you go one level below the architecture diagram on a single topic, such as how to avoid double-counting after a replay. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
 
+**Degenerate dimension** — An identifier kept on a fact row with no dimension table of its own, such as `order_id` on an order line, so lines can be grouped without a join. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
+
 **Deletion vector** — In Delta Lake, a small side file marking rows of a data file as deleted, so DELETE, UPDATE and MERGE avoid rewriting the whole file; a later OPTIMIZE purges the marked rows. Availability is version-dependent. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Delta Lake** — An open table format that adds a transaction log beside Parquet files in object storage, giving atomic commits, versions, schema enforcement and row-level updates. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
@@ -115,6 +123,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Dimension** — A table describing the things an event involved (customer, product, delivery slot). Dimensions are small and descriptive; you filter and group by their columns. Compare with fact table. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 **Effectively-once** — Another name for exactly-once effect: messages may travel twice, but an idempotent write or transaction makes the result as if each was processed once. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
+**ELT (extract, load, transform)** — Loading raw source data into the warehouse first and transforming it there with SQL, instead of transforming it before loading. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
 
 **Error budget** — The amount of failure an SLO allows: a 99% target over 365 days permits about 3 to 4 misses a year. Once it is spent, you pause risky changes and fix reliability. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
@@ -170,6 +180,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Incremental snapshot** — A Debezium snapshot that reads a table in primary-key chunks while streaming continues, using watermark markers in the log to drop chunk rows that changed meanwhile. It lets you backfill one table without a lock or a full restart. See: [Debezium and CDC Tools](04-technology-deep-dives/09-debezium-and-cdc-tools.md)
 
+**Inferred member** — A placeholder dimension row, with the natural key and "Unknown" attributes, inserted when a fact arrives before its dimension row; it is filled in when the real row arrives. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
+
 **Inverted index** — A map from every word to the list of documents that contain it, like the index at the back of a book. It lets a search engine find any word in seconds, at a storage cost close to the size of the raw text. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
 ## K
@@ -220,6 +232,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## N
 
+**Natural key** — The identifier the source system uses for a thing (`customer_id`). It stays the same across all of a dimension's SCD Type 2 versions. Compare surrogate key. See: [Data Model Design](01-the-framework/06-data-model-design.md)
+
 **Non-functional requirement (NFR)** — A measurable quality of how well a system does its job: freshness, completeness, correctness, retention, query speed, cost. It only counts as a requirement once it has a number. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
 ## O
@@ -247,6 +261,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Partition overwrite** — Making a run replace exactly one partition of the output (for example one date) instead of appending to it, so a rerun gives the same result. The default idempotent write for dated batch outputs. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Partition pruning** — The engine dropping every partition that cannot match a query's filter before reading any data. It only works when the filter is on the partition column itself, not a function of it. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Posting period** — The accounting month a financial event is booked in: its own month if still open, otherwise the current open month, so a closed month never changes. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
 
 **Processing time** — The moment a system handles an event, as opposed to when it happened. Processing time is almost always later than event time, and the gap is what makes late data possible. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
@@ -331,6 +347,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **State backend** — The component that decides how a stream job stores its keyed state while running: in memory (heap), on local disk (RocksDB), or on remote storage with a local cache (disaggregated, Flink 2.x). See: [Flink](04-technology-deep-dives/08-flink.md)
 
 **Storage tier** — A price and speed class of object storage: standard is instant and costs more, archive is much cheaper per TB but slow or fee-bearing to read. Lifecycle rules move data between tiers by age. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
+
+**Surrogate key** — An ID the warehouse makes up for each row of a dimension (one per SCD Type 2 version), separate from the source's natural key. Facts store it to point at the version that was true at the time. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 ## T
 
