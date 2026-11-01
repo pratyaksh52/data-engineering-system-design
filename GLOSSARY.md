@@ -82,6 +82,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Credit** — Snowflake's billing unit for compute: the smallest virtual warehouse burns 1 credit per running hour and each size up doubles it, at roughly $2 to 4 per credit. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
+**Cube** — Pre-computed aggregates for every combination of a set of dimensions, so any filter-and-group question becomes a lookup. With many dimensions or high-cardinality ones (merchant, issuer) the combinations explode, which is why live dashboards aggregate unplanned questions at query time instead. See: [Real-Time Dashboard](05-breakdowns-core/04-real-time-dashboard.md)
+
 ## D
 
 **DAG (directed acyclic graph)** — The set of tasks in a pipeline with arrows meaning "must finish before" and no loops. An orchestrator runs it and tracks which tasks succeeded. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
@@ -150,6 +152,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Freshness** — How old the newest data in a table or dashboard is compared with now, for example "no more than 15 minutes behind the source". One of the three common data SLAs, next to completeness and quality. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
+**Freshness budget** — The end-to-end delay of a pipeline split into each hop's share (producer, stream job, store ingestion, cache refresh, browser push), so you can see where the time goes and which hop to change. See: [Real-Time Dashboard](05-breakdowns-core/04-real-time-dashboard.md)
+
 **Full load** — Reading the whole source on every run and replacing your copy. Simple and handles deletes for free, but the work grows with the table. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
 
 **Functional requirement** — Something the system must produce or do, stated from the consumer's side, such as "marketing sees conversions per campaign". In a data system it is usually an output table, metric or feed. Compare with non-functional requirement. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
@@ -181,6 +185,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Incremental snapshot** — A Debezium snapshot that reads a table in primary-key chunks while streaming continues, using watermark markers in the log to drop chunk rows that changed meanwhile. It lets you backfill one table without a lock or a full restart. See: [Debezium and CDC Tools](04-technology-deep-dives/09-debezium-and-cdc-tools.md)
 
 **Inferred member** — A placeholder dimension row, with the natural key and "Unknown" attributes, inserted when a fact arrives before its dimension row; it is filled in when the real row arrives. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
+
+**Ingest-time rollup** — A rollup the serving store maintains itself as rows arrive (Druid rollup at ingestion, a ClickHouse materialized view into a summing table), so no separate aggregation job is needed. Pinot's star-tree index is a related query accelerator built per segment, not a rollup table. See: [Real-Time Dashboard](05-breakdowns-core/04-real-time-dashboard.md)
 
 **Inverted index** — A map from every word to the list of documents that contain it, like the index at the back of a book. It lets a search engine find any word in seconds, at a storage cost close to the size of the raw text. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
@@ -291,6 +297,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Replication slot** — A bookmark in a database such as Postgres that makes it keep its change log until a CDC reader confirms it has consumed it. A stopped reader makes the log pile up and can fill the source's disk, so alert on slot lag. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
 **Reprocessing** — Running already-stored data through new or corrected logic, whether the trigger is a bug, a new rule or a new column. A backfill is its date-range form. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
+
+**Request coalescing** — When many identical requests arrive while a cached result is missing or expired, running the query once and giving every waiting caller that one result, so a cache expiry does not become a burst of identical queries. See: [Real-Time Dashboard](05-breakdowns-core/04-real-time-dashboard.md)
 
 **REST catalog** — An open HTTP API for table catalogs that any engine can speak, giving engine-neutral access, server-side commits and centrally vended storage credentials. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
