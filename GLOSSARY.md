@@ -74,6 +74,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Event time** — The moment an event actually happened, as recorded by the source (for example, when a user tapped "buy"). Compare with processing time. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
+**Event sourcing** — Storing every change as an immutable, business-named event and treating the current state as something calculated from those events. CDC derives events from state; event sourcing derives state from events. See: [Event Sourcing](03-architecture-patterns/05-event-sourcing.md)
+
 **Exactly-once** — The effect of processing each event once, with no loss and no duplicates. In practice it is built from at-least-once delivery plus idempotent writes or transactions, not from a network that never repeats itself. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 ## F
@@ -138,6 +140,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Orchestrator** — The tool (Airflow, Dagster, Prefect and similar) that runs a DAG of tasks, waits on dependencies, retries failures and records what ran. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
+**Outbox pattern** — Writing a business event into an `outbox` table in the same database transaction as the data change, and letting CDC publish it. It avoids the dual write, where a crash between the database and the message queue loses or invents events. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
+
 ## P
 
 **Partition** — A slice of a dataset or stream, chosen by a key or a range, that can be stored and processed independently. Partitions are how data systems spread work across machines and skip data they don't need. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -147,6 +151,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Partition pruning** — The engine dropping every partition that cannot match a query's filter before reading any data. It only works when the filter is on the partition column itself, not a function of it. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 **Processing time** — The moment a system handles an event, as opposed to when it happened. Processing time is almost always later than event time, and the gap is what makes late data possible. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
+
+**Projection** — A read-optimised table calculated from an event log by a process that subscribes to it. It is disposable: fix the logic, empty it and replay the log to rebuild. See: [Event Sourcing](03-architecture-patterns/05-event-sourcing.md)
 
 ## Q
 
@@ -163,6 +169,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Reconciliation** — Comparing your output with an independent source of truth (for example daily revenue against the payments provider's totals) and investigating any gap beyond a set tolerance. See: [Deep Dives](01-the-framework/08-deep-dives.md)
 
 **Replay** — Re-reading stored events (from a message log offset or the raw layer) and processing them again with the same or fixed logic. Safe only when the writes are idempotent. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
+
+**Replication slot** — A bookmark in a database such as Postgres that makes it keep its change log until a CDC reader confirms it has consumed it. A stopped reader makes the log pile up and can fill the source's disk, so alert on slot lag. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
 **Reprocessing** — Running already-stored data through new or corrected logic, whether the trigger is a bug, a new rule or a new column. A backfill is its date-range form. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
 
@@ -206,6 +214,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Tiered storage** — A message-log feature that offloads older segments to object storage and reads them back on demand, so replay can reach further back than broker disks allow, at slower read speed. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
 
+**Tombstone** — A message with a key and an empty value, which tells a compacted Kafka topic to eventually forget that key. CDC tools emit one after a delete event. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
+
 ## U
 
 **Upsert (MERGE)** — Writing a row if its key is new and updating it if the key already exists. Applying the same batch twice changes nothing, which makes it an idempotent write for tables of entities. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
@@ -221,3 +231,5 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Watermark column** — A column that only moves forward (usually `updated_at`) whose largest loaded value is stored, so the next incremental run asks only for rows beyond it. Misses hard deletes and late commits unless you add an overlap window. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
 **Windowed dedup** — Streaming deduplication that remembers each key for a fixed period and then forgets it. State stays bounded, but duplicates arriving after the window pass through. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
+**Write-ahead log (WAL)** — The file where a database records every change before applying it, so it can recover after a crash and feed replicas. Log-based CDC reads it (Postgres: WAL, MySQL: binlog). See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
