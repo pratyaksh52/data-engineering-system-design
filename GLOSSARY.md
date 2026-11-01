@@ -72,6 +72,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Copy-on-write** — Handling an update or delete by rewriting every data file that holds an affected row, so reads stay plain and fast but writes are expensive. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
+**Count-Min Sketch** — A small grid of counters for estimating how often each key appears in a huge stream: each key increments one counter per row, and its estimate is the smallest of them. It never undercounts and may overcount by a bounded amount; paired with a heap it gives approximate top-K in fixed memory. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
+
 **Credit** — Snowflake's billing unit for compute: the smallest virtual warehouse burns 1 credit per running hour and each size up doubles it, at roughly $2 to 4 per credit. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
 ## D
@@ -154,6 +156,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Hot, warm and cold tiers** — Storing data at different price and speed points by age: the newest, most-read data on fast, expensive storage (a search index on SSD), older data on cheaper, slower storage (object storage, then an archive tier). Per-use retention requirements set the boundaries. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
+**HyperLogLog (HLL)** — A sketch that estimates the number of distinct values in a stream (unique visitors) from per-bucket maxima of hashed leading zeros. About 12 KB gives roughly 0.8% standard error at any scale, and two sketches merge into the sketch of their union, so daily counts combine over any range. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
+
 ## I
 
 **Idempotent** — An operation that gives the same end result whether it runs once or many times. Idempotent pipeline steps can be retried or replayed safely. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
@@ -187,6 +191,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Late-arriving dimension** — A fact that references a dimension row (for example a customer) which has not been loaded yet. Handle it with an inferred placeholder member or a quarantine-and-retry table, not a join that silently drops the fact. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 **Liquid clustering** — A Delta Lake layout feature (`CLUSTER BY`) that clusters data incrementally on chosen keys and lets you change the keys later without rewriting the table; it replaces partitioning and Z-order on new tables. Availability is version-dependent. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
+**Local-global aggregation** — Pre-aggregating partial results (counts, sketches) on each upstream worker for a short interval before sending them to the worker that owns the key, so one hot key receives a few partials instead of every event. Works only for mergeable aggregates. Also called two-phase aggregation. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
 **Log agent** — A small program on every host (Fluent Bit, Vector, the OpenTelemetry Collector) that tails log files and container output, adds metadata, buffers to local disk and ships lines on, so services never block on logging. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
@@ -258,6 +264,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Read replica** — A copy of a database kept in sync with the primary and used for reading, so heavy extracts or CDC do not slow the live application. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
+**Real-time OLAP store** — A columnar database (ClickHouse, Druid, Pinot) that ingests a stream continuously and answers many small aggregate queries in tens to hundreds of milliseconds, used to serve user-facing dashboards. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
+
 **Rebalance** — Redistributing a Kafka topic's partitions among the consumers in a group when one joins, leaves or is declared dead. With the classic protocol the whole group pauses during it. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Reconciliation** — Comparing your output with an independent source of truth (for example daily revenue against the payments provider's totals) and investigating any gap beyond a set tolerance. See: [Deep Dives](01-the-framework/08-deep-dives.md)
@@ -273,6 +281,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Retention** — How long data is kept before it is deleted or moved to cheaper storage, including any rule to delete a person's data on request. Raw volume times retention is the storage bill. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
 **Reverse ETL** — Reading a warehouse table or query result and writing it into operational tools (CRM, ad platform, email tool) through their APIs, usually as a scheduled diff-and-upsert sync. See: [Reverse ETL](03-architecture-patterns/09-reverse-etl.md)
+
+**Rollup** — A pre-computed aggregate at a fixed grain (clicks per link per minute or per day), so a dashboard reads a few rows instead of scanning raw events. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
 **Runbook** — A short document tied to one alert: what it means, how to confirm it, likely causes, fixes and who to escalate to. It lets a tired on-call engineer act without reading code. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
@@ -301,6 +311,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Self-serve data platform** — Shared tooling run by a platform team (storage, templates, catalog, access control, observability) that lets a domain team publish a data product without being an infrastructure expert. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Serving layer** — The final tables or stores that consumers read, kept small and shaped for their questions so internal changes do not break them. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
+
+**Sketch** — A small, fixed-size data structure that summarizes a large stream and answers one question approximately, such as HyperLogLog for distinct counts or Count-Min Sketch for frequencies, trading a known error for far less memory. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
 **Skew** — Uneven load across partitions or workers, such as one city producing a third of the orders, so one slow task decides how long the whole job takes. Fix it with a different or compound key. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
@@ -349,6 +361,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Tiered storage** — A message-log feature that offloads older segments to object storage and reads them back on demand, so replay can reach further back than broker disks allow, at slower read speed. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
 
 **Tombstone** — A message with a key and an empty value, which tells a compacted Kafka topic to eventually forget that key. CDC tools emit one after a delete event. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
+
+**Top-K** — The K items with the largest counts (the 100 most-clicked links in the last hour). Merging per-worker top-K lists is exact only when each key's full count lives on one worker. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
 ## U
 
