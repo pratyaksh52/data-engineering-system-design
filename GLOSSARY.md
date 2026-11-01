@@ -24,6 +24,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Back-of-envelope estimate** — A quick, rounded calculation (events per second, TB per day, partitions needed) done aloud to see whether a design is feasible. Its job is to change a design decision, not to be precise. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
+**Backpressure** — What happens when a stream operator cannot keep up: bounded buffers fill, upstream operators block, and the slowdown reaches the source, so lag rises instead of data being dropped. Fix the first busy operator, not the source. See: [Flink](04-technology-deep-dives/08-flink.md)
+
 **Bad → Good → Great** — A way to compare options for one design decision: a Bad option that fails a requirement, a Good one that works with known gaps, and a Great one that closes the gaps at a stated cost. Choose the level your requirements justify, not the highest. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Below the line** — Explicitly out of scope. In the framework you list your requirements, draw a line under them, and write what you are deliberately not building beneath it. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
@@ -43,6 +45,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Change data feed (CDF)** — A Delta Lake option that records row-level changes (insert, update before and after, delete) on each write and exposes them for reading, so downstream jobs process only what changed. It starts from the version where it was enabled. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Checkpoint** — Durable storage where a streaming job records its progress (source offsets and operator state), so a restart resumes from the last good point instead of starting over. See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
+
+**Checkpoint barrier** — A marker Flink injects into the data stream; when an operator sees it, everything before belongs to that checkpoint, so the job gets a consistent snapshot without stopping. See: [Flink](04-technology-deep-dives/08-flink.md)
 
 **Clustering** — Ordering rows inside each partition by another column (also called sorting) so that queries filtering on it can skip blocks using min/max statistics. It is the fine cut after partitioning's coarse one, and it decays as unsorted data arrives. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
@@ -158,6 +162,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Kappa architecture** — One streaming pipeline over a replayable message log, with no batch layer; to fix history you replay the log through a new version of the job into a separate output and then switch consumers. Limited by log retention and replay cost. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
 
+**Keyed state** — Per-key memory a stream operator keeps (last value, list, map) after a `keyBy`, stored locally on the subtask that owns that key. See: [Flink](04-technology-deep-dives/08-flink.md)
+
 **KRaft** — Kafka's built-in metadata layer, where a few controller nodes agree on cluster metadata using the Raft protocol. It replaced ZooKeeper, which Kafka 4.0 no longer supports. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 ## L
@@ -254,6 +260,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## S
 
+**Savepoint** — A manually triggered, portable snapshot of a Flink job's state, used for upgrades, rescaling and migrations. Unlike a checkpoint, you own it and it is not auto-deleted. See: [Flink](04-technology-deep-dives/08-flink.md)
+
 **Sensor** — An orchestrator task whose only job is to wait for a condition, such as a file landing or a partition appearing, before downstream tasks run. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Salting** — Adding a small random suffix to a hot key so its records spread over several partitions. Readers must then merge those slices, and ordering across them is lost. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -286,6 +294,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Stage** — A run of Spark tasks that needs no data movement between them; a new stage starts at every shuffle. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
+**State backend** — The component that decides how a stream job stores its keyed state while running: in memory (heap), on local disk (RocksDB), or on remote storage with a local cache (disaggregated, Flink 2.x). See: [Flink](04-technology-deep-dives/08-flink.md)
+
 **Storage tier** — A price and speed class of object storage: standard is instant and costs more, archive is much cheaper per TB but slow or fee-bearing to read. Lifecycle rules move data between tiers by age. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
 
 ## T
@@ -311,6 +321,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Tombstone** — A message with a key and an empty value, which tells a compacted Kafka topic to eventually forget that key. CDC tools emit one after a delete event. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
 ## U
+
+**Two-phase commit** — A sink protocol for exactly-once output: stage writes and pre-commit at the checkpoint, then commit only after the whole checkpoint succeeds, so output appears only at checkpoint time. See: [Flink](04-technology-deep-dives/08-flink.md)
 
 **Upsert (MERGE)** — Writing a row if its key is new and updating it if the key already exists. Applying the same batch twice changes nothing, which makes it an idempotent write for tables of entities. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
