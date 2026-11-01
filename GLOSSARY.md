@@ -190,6 +190,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Retention** — How long data is kept before it is deleted or moved to cheaper storage, including any rule to delete a person's data on request. Raw volume times retention is the storage bill. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
+**Reverse ETL** — Reading a warehouse table or query result and writing it into operational tools (CRM, ad platform, email tool) through their APIs, usually as a scheduled diff-and-upsert sync. See: [Reverse ETL](03-architecture-patterns/09-reverse-etl.md)
+
 **Runbook** — A short document tied to one alert: what it means, how to confirm it, likely causes, fixes and who to escalate to. It lets a tired on-call engineer act without reading code. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
 ## S
