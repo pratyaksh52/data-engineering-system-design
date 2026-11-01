@@ -6,6 +6,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Access pattern** — How a dataset will be read: which queries, by whom, how often, scanning a lot or looking up a little. It decides table layout and the serving store. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
+**Adaptive query execution (AQE)** — Spark's runtime re-optimization, on by default since 3.2: it uses real shuffle sizes to merge small partitions, switch a join to broadcast, and split skewed join partitions. It does not fix a skewed group-by. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
+
 **Alert fatigue** — What happens when a team gets so many alerts that it stops acting on them, including the real ones. Measure it by checking how many of the last 30 pages needed a human. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
 **Allowed lateness** — Extra time a stream processor keeps a window's state after the watermark has passed it, so an event arriving in that period triggers a corrected result instead of being discarded. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
@@ -24,6 +26,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Below the line** — Explicitly out of scope. In the framework you list your requirements, draw a line under them, and write what you are deliberately not building beneath it. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
 **Bloom filter** — A compact structure that answers "have I seen this key?" with "definitely not" or "probably yes". It never forgets a key but has a tunable false-positive rate, so it fits approximate dedup, not payments. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
+**Broadcast join** — A join where the small table is copied to every executor so the big table is never shuffled. Fast, but the small side must fit in memory. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
 
 ## C
@@ -87,6 +91,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Event sourcing** — Storing every change as an immutable, business-named event and treating the current state as something calculated from those events. CDC derives events from state; event sourcing derives state from events. See: [Event Sourcing](03-architecture-patterns/05-event-sourcing.md)
 
 **Exactly-once** — The effect of processing each event once, with no loss and no duplicates. In practice it is built from at-least-once delivery plus idempotent writes or transactions, not from a network that never repeats itself. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
+**Executor** — A Spark worker process with a few cores and some memory that runs tasks and holds cached and shuffle data. The driver schedules work onto executors. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
 ## F
 
@@ -204,6 +210,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Schema registry** — A service that stores every version of each schema and rejects a new version that violates the configured compatibility mode. Producers and consumers look schemas up from it instead of hard-coding them. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
+**Shuffle** — Redistributing data across a cluster so rows with the same key land together; it writes to disk and crosses the network, so it is the costliest step in a Spark job and the boundary between stages. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
+
 **Speed layer** — The streaming half of a Lambda design: it computes approximate results for the recent past, until the batch layer's exact result replaces them. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
 
 **Self-serve data platform** — Shared tooling run by a platform team (storage, templates, catalog, access control, observability) that lets a domain team publish a data product without being an infrastructure expert. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
@@ -214,9 +222,13 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **SLA / SLO** — An SLO (service level objective) is a target you set for a measurable quality, such as "the daily table is ready by 07:00 on 99% of days". An SLA (service level agreement) is an SLO that has been promised to someone and usually has consequences if it is missed. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
+**Spill** — A task writing intermediate data to local disk because it ran out of execution memory. The job still finishes, slowly. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
+
 **Spot capacity** — Spare cloud machines sold at a large discount (often 60 to 70 percent) that the cloud can reclaim at short notice. Suits retryable batch jobs, not state you cannot rebuild. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
 
 **Small-files problem** — Too many tiny files in storage (often from frequent streaming writes), which makes listing and opening them dominate query time. The fix is to write bigger files or run compaction. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Stage** — A run of Spark tasks that needs no data movement between them; a new stage starts at every shuffle. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
 **Storage tier** — A price and speed class of object storage: standard is instant and costs more, archive is much cheaper per TB but slow or fee-bearing to read. Lifecycle rules move data between tiers by age. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
 
