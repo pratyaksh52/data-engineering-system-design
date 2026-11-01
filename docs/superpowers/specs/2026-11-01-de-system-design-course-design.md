@@ -215,9 +215,19 @@ Before a lesson counts as done, it must pass:
 4. **Template followed** for its lesson type, and all Mermaid blocks are valid syntax.
 5. **Constraint check:** no mention of the reference course, its company, site or author; no copied text from any source; cloud-neutral.
 
+### Per-lesson review pipeline (required for every lesson and quiz)
+A lesson is not done when it's written. It's done when it has passed through these steps, in this order:
+
+1. **Write:** the author drafts the lesson.
+2. **Clean-context verification:** a **fresh agent that did not write the lesson and has no memory of drafting it** (a new subagent given only this spec, the lesson file, and the files the lesson links to) checks the lesson against the quality bar above (checks 1–5) and the template for its type. It also checks technical accuracy. It **applies the fixes directly** to the lesson, then reports what it changed and anything it couldn't fix.
+3. **Humanizer pass:** the same clean-context agent (still not the author) runs the `/humanizer` skill on the lesson and **applies the suggested changes** to the file. Humanizer edits must not change technical meaning, numbers, Mermaid blocks, code, headings required by the template, or `<details>` structure. If a suggestion would, skip it and note it.
+4. **Final mechanical check:** after the humanizer edits, re-run the case-insensitive forbidden-terms search across the repo (zero hits required) and confirm every Mermaid block and relative link still matches what it was before step 3.
+
+The point of the clean context is that the reviewer reads the lesson the way a learner would, without the author's assumptions filling in gaps. The author does not review their own lesson.
+
 ## 9. Left to the builder
 - Exact wording, examples, scenarios and numbers within each lesson.
 - Exact quiz questions.
 - Which deep dives each breakdown picks (3–5), and which decisions get a Bad/Good/Great ladder.
-- The order lessons are written in, and how review is organized, as long as every lesson passes Section 8.
+- The order lessons are written in, and how lessons are batched, as long as every lesson goes through the Section 8 review pipeline.
 - README wording and the "short on time" path.
