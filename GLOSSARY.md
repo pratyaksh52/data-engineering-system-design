@@ -14,6 +14,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Anomaly detection** — Automatically flagging a value that differs from its usual pattern, in its simplest useful form a same-weekday baseline with a tolerance. Reserve it for a few high-value metrics, because every threshold on a noisy number produces some false alarms. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
+**Asset (Airflow)** — A logical dataset that an Airflow task declares it updates; other DAGs can schedule on it instead of on a clock (data-aware scheduling). Called a dataset before Airflow 3. See: [Airflow](04-technology-deep-dives/03-airflow.md)
+
 **At-least-once** — A delivery guarantee where every event is delivered one or more times, so nothing is lost but duplicates can happen. Pair it with an idempotent write or a deduplication step to get correct results. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 ## B
@@ -29,8 +31,12 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Broadcast join** — A join where the small table is copied to every executor so the big table is never shuffled. Fast, but the small side must fit in memory. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
+**Broker** — A server in a Kafka cluster that stores partitions and serves producers and consumers. A cluster is several brokers, so a partition can be copied to more than one. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
 
 ## C
+
+**Catchup** — The Airflow setting that makes the scheduler create a run for every missed interval since the start date. Off by default in Airflow 3. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **CDC (change data capture)** — Reading a database's change log (inserts, updates and deletes) and streaming those changes to other systems, instead of repeatedly querying the tables. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
@@ -52,9 +58,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Consumer** — Whoever reads the output of a data system: an analyst, a dashboard, an ML model or another team's pipeline. A data design is judged by how well it serves its consumers. See: [How Interviews Work](01-the-framework/01-how-interviews-work.md)
 
+**Consumer group** — Consumers sharing one `group.id` that split a topic's partitions between them, each partition going to exactly one consumer. Different groups read the same topic independently. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
+**Consumer lag** — For a Kafka partition, the latest offset minus the group's committed offset: how far behind the consumers are. Rising lag is the main health signal of a streaming pipeline. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
 ## D
 
 **DAG (directed acyclic graph)** — The set of tasks in a pipeline with arrows meaning "must finish before" and no loops. An orchestrator runs it and tracks which tasks succeeded. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
+
+**Data interval** — The slice of event time an orchestrator run is responsible for (for example Oct 31 00:00 to Nov 1 00:00), independent of when the run actually starts. Reading it, not the clock, keeps reruns and backfills correct. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Data contract** — An explicit, versioned agreement between a data producer and its consumers about a dataset's schema, meaning, quality and delivery expectations. Its purpose is to make breaking changes visible before they reach consumers. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
@@ -67,6 +79,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Data product** — A dataset published by a domain team as a product: a named owner, a contract, a catalog entry and a service level, for consumers who can rely on it. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Data virtualization** — Querying data in place across several systems through one SQL interface (a federated query) instead of copying it first. Good for exploration and light joins; heavy or frequent joins should be materialised. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
+
+**Deferrable operator** — An Airflow operator or sensor that hands its waiting to a single async process (the triggerer) so it holds no worker slot while it waits. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
@@ -122,11 +136,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Idempotent** — An operation that gives the same end result whether it runs once or many times. Idempotent pipeline steps can be retried or replayed safely. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
+**In-sync replicas (ISR)** — The Kafka partition leader plus the followers that are caught up with it. A message counts as committed once all of them have it, and only an ISR member can become the new leader. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
 **Incremental load** — Reading only the rows that are new or changed since the last run, usually with a watermark column. Cheaper per run than a full load, but it misses hard deletes unless handled. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
 
 ## K
 
 **Kappa architecture** — One streaming pipeline over a replayable message log, with no batch layer; to fix history you replay the log through a new version of the job into a separate output and then switch consumers. Limited by log retention and replay cost. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
+
+**KRaft** — Kafka's built-in metadata layer, where a few controller nodes agree on cluster metadata using the Raft protocol. It replaced ZooKeeper, which Kafka 4.0 no longer supports. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 ## L
 
@@ -155,6 +173,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Object storage** — Cheap, durable storage that holds files as objects in flat buckets and is accessed over an API (S3, GCS, Azure Blob). It is the usual base layer of a data lake. Objects are written whole and are not edited in place. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Observability** — Being able to answer "why is this unhealthy?" without guessing, using per-stage metrics, run history, lineage and logs. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
+
+**Offset** — The sequential number of a message within a Kafka partition; its address in that log. A consumer's progress is the offset it has read up to. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **OLAP (online analytical processing)** — Workloads that scan and aggregate large amounts of data to answer questions, such as "revenue by region by month". Column-oriented warehouses are built for it. Compare with OLTP, which handles many small reads and writes to individual rows. See: [Snowflake and Cloud Warehouses](04-technology-deep-dives/05-snowflake.md)
 
@@ -186,6 +206,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Read replica** — A copy of a database kept in sync with the primary and used for reading, so heavy extracts or CDC do not slow the live application. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
+**Rebalance** — Redistributing a Kafka topic's partitions among the consumers in a group when one joins, leaves or is declared dead. With the classic protocol the whole group pauses during it. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
 **Reconciliation** — Comparing your output with an independent source of truth (for example daily revenue against the payments provider's totals) and investigating any gap beyond a set tolerance. See: [Deep Dives](01-the-framework/08-deep-dives.md)
 
 **Replay** — Re-reading stored events (from a message log offset or the raw layer) and processing them again with the same or fixed logic. Safe only when the writes are idempotent. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
@@ -201,6 +223,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Runbook** — A short document tied to one alert: what it means, how to confirm it, likely causes, fixes and who to escalate to. It lets a tired on-call engineer act without reading code. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
 ## S
+
+**Sensor** — An orchestrator task whose only job is to wait for a condition, such as a file landing or a partition appearing, before downstream tasks run. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Salting** — Adding a small random suffix to a hot key so its records spread over several partitions. Readers must then merge those slices, and ordering across them is lost. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
@@ -241,6 +265,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Table format** — A metadata layer (Iceberg, Delta Lake, Hudi) that turns a pile of files in object storage into a table with transactions, schema changes and snapshots. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Throughput** — How much data a component moves per unit of time, such as MB/s per Kafka partition or events/s per pipeline. Compare with latency, which is how long one operation takes. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
+
+**Topic** — A named stream of messages in Kafka, split into partitions. Producers append to it and consumer groups read from it. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Trigger** — In Spark Structured Streaming, the setting that decides when the next micro-batch starts (as soon as possible, every N minutes, or once for everything available and then stop). See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
 
