@@ -23,6 +23,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Bad → Good → Great** — A way to compare options for one design decision: a Bad option that fails a requirement, a Good one that works with known gaps, and a Great one that closes the gaps at a stated cost. Choose the level your requirements justify, not the highest. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Below the line** — Explicitly out of scope. In the framework you list your requirements, draw a line under them, and write what you are deliberately not building beneath it. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
+**Bloom filter** — A compact structure that answers "have I seen this key?" with "definitely not" or "probably yes". It never forgets a key but has a tunable false-positive rate, so it fits approximate dedup, not payments. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
 
 ## C
 
@@ -52,11 +54,17 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
+**Dedup key** — The column or columns that identify one real-world event, so two records with the same key count as one. Best created at the source before any retry. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
+**Deduplication (dedup)** — Collapsing records that describe the same real-world event into one. In batch it is a window function or MERGE; in a stream it needs state sized by window length times event rate. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
 **Deep dive** — A stretch of the interview where you go one level below the architecture diagram on a single topic, such as how to avoid double-counting after a replay. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
 
 ## E
 
 **Dimension** — A table describing the things an event involved (customer, product, delivery slot). Dimensions are small and descriptive; you filter and group by their columns. Compare with fact table. See: [Data Model Design](01-the-framework/06-data-model-design.md)
+
+**Effectively-once** — Another name for exactly-once effect: messages may travel twice, but an idempotent write or transaction makes the result as if each was processed once. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 **Error budget** — The amount of failure an SLO allows: a 99% target over 365 days permits about 3 to 4 misses a year. Once it is spent, you pause risky changes and fix reliability. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
@@ -95,6 +103,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Incremental load** — Reading only the rows that are new or changed since the last run, usually with a watermark column. Cheaper per run than a full load, but it misses hard deletes unless handled. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
 
 ## L
+
+**Lambda architecture** — Running a slow, exact batch layer and a fast, approximate speed layer over the same events, with a serving layer that merges them at a cutoff time. It buys correctness and freshness at the price of the same logic in two codebases. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
 
 **Late data** — An event that arrives after the system has already moved past its event time, for example a mobile event uploaded two hours after it happened. You must decide whether to drop it, include it in a correction, or hold results back to wait for it. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
@@ -160,6 +170,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Schema registry** — A service that stores every version of each schema and rejects a new version that violates the configured compatibility mode. Producers and consumers look schemas up from it instead of hard-coding them. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
+**Speed layer** — The streaming half of a Lambda design: it computes approximate results for the recent past, until the batch layer's exact result replaces them. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
+
 **Serving layer** — The final tables or stores that consumers read, kept small and shaped for their questions so internal changes do not break them. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Skew** — Uneven load across partitions or workers, such as one city producing a third of the orders, so one slow task decides how long the whole job takes. Fix it with a different or compound key. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -196,3 +208,4 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 
 **Watermark column** — A column that only moves forward (usually `updated_at`) whose largest loaded value is stored, so the next incremental run asks only for rows beyond it. Misses hard deletes and late commits unless you add an overlap window. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
+**Windowed dedup** — Streaming deduplication that remembers each key for a fixed period and then forgets it. State stays bounded, but duplicates arriving after the window pass through. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
