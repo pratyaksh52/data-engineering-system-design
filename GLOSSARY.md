@@ -30,6 +30,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **At-least-once** — A delivery guarantee where every event is delivered one or more times, so nothing is lost but duplicates can happen. Pair it with an idempotent write or a deduplication step to get correct results. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
+**Attribution** — Deciding which ad or recommendation, if any, gets credit for a later action such as a purchase or a play, using a stated rule (for example last touch, clicks before views). See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
+
+**Attribution window** — How long after an ad interaction a purchase can still be credited to it, such as 14 days after a click or 1 day after a viewed impression. Numbers reported by ad date keep growing until the window closes. See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
+
 ## B
 
 **Backfill** — Re-running a pipeline over a past time range to fill in missing data or to correct data that was wrong. A safe backfill relies on idempotent jobs so it can be repeated without double-counting. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
@@ -54,6 +58,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Broker** — A server in a Kafka cluster that stores partitions and serves producers and consumers. A cluster is several brokers, so a partition can be copied to more than one. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Bundle manifest** — A record that deploys an ML model together with the exact data versions it was trained with (catalog snapshot, feature view versions, label version), so serving never mixes a model with data from another version. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
+
+**Budget pacing** — The feedback loop that sends each ad campaign's spend so far back to the ad server, so it stops serving the campaign when the daily budget is used up. Late or missing spend means ads served that cannot be billed. See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
 
 **Bus matrix** — A grid of which fact tables use which dimensions. It shows at a glance which dimensions must be conformed so numbers from different facts line up. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
 
@@ -246,6 +252,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Hidden partitioning** — Iceberg partitioning by a transform of a real column (such as `days(event_ts)`), so users filter on the real column and still get pruning, with no derived partition column to remember. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
+**HMAC** — A short signature computed from a message and a secret key; only a holder of the key can produce a valid one, so any change to the message is detected. Used to make ad tokens tamper-proof. See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
+
 **Hot key** — A key that receives far more traffic than the others, so the one worker or partition that owns it becomes the bottleneck. Check each stage of a pipeline separately, since each is keyed differently; often the fix is to aggregate by an even key first and key by the skewed one only afterwards. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
 
 **Hot partition** — A partition that receives far more traffic or data than the others, usually because the partition key is skewed (one huge customer, one viral item). It becomes the bottleneck for the whole system. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -279,6 +287,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Inferred member** — A placeholder dimension row, with the natural key and "Unknown" attributes, inserted when a fact arrives before its dimension row; it is filled in when the real row arrives. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 **Ingest-time rollup** — A rollup the serving store maintains itself as rows arrive (Druid rollup at ingestion, a ClickHouse materialized view into a summing table), so no separate aggregation job is needed. Pinot's star-tree index is a related query accelerator built per segment, not a rollup table. See: [Real-Time Dashboard](05-breakdowns-core/04-real-time-dashboard.md)
+
+**Interval join** — A stream-to-stream join where a record matches records from the other stream whose timestamps fall within a fixed range of its own (a click up to 30 minutes after its impression), so state is kept only for that range. See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
+
+**Invalid traffic (IVT)** — Ad impressions and clicks not made by a real person with real interest: bots, click farms, a competitor draining a budget. Advertisers are never charged for it, and some is only found days or weeks later. See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
 
 **Inverted index** — A map from every word to the list of documents that contain it, like the index at the back of a book. It lets a search engine find any word in seconds, at a storage cost close to the size of the raw text. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
@@ -472,6 +484,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Sessionization** — Grouping one user's events into sessions, closing a session after a gap of inactivity (such as 30 minutes), so raw heartbeats or clicks become one row per visit or viewing. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
+**Settlement (billing day)** — The batch run that makes one billing day final once its late events and fraud verdicts are in: it dedups, removes invalid traffic, applies the budget cap and posts charges. Afterwards the day's charges can only be credited, never raised. See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
+
 **Siloed model** — A multi-tenant layout where a tenant gets its own tables, compute and sometimes encryption key. Strong isolation and simple deletion, but too costly to give every small tenant. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
 
 **Sketch** — A small, fixed-size data structure that summarizes a large stream and answers one question approximately, such as HyperLogLog for distinct counts or Count-Min Sketch for frequencies, trading a known error for far less memory. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
@@ -551,6 +565,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **VACUUM** — The Delta Lake command that physically deletes data files no longer referenced by the current version and older than the retention period (7 days by default). It ends time travel to the deleted versions. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Velocity feature** — A count or sum over a recent time window per entity, such as payment attempts on this card in the last 10 minutes. The shortest windows may need computing inside the request so they include the previous event. See: [Fraud Detection](06-breakdowns-advanced/03-fraud-detection.md)
+
+**View-through attribution** — Crediting a sale to an ad the shopper saw on screen but did not click, within a short window (such as 1 day). Clicks normally take precedence over views. See: [Ad Clickstream](06-breakdowns-advanced/08-ad-clickstream.md)
 
 **Virtual warehouse** — In Snowflake, a rented compute cluster that runs queries over shared storage; many can read the same tables without competing. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
