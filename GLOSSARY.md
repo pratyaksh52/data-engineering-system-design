@@ -20,6 +20,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Anomaly detection** — Automatically flagging a value that differs from its usual pattern, in its simplest useful form a same-weekday baseline with a tolerance. Reserve it for a few high-value metrics, because every threshold on a noisy number produces some false alarms. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
+**Approximate nearest neighbour (ANN) index** — A structure built over many embeddings (HNSW, a layered graph, is the common algorithm) that returns the closest few hundred to a query vector in about a millisecond, accepting it may miss a few true neighbours. Rebuilt in full when the embedding version changes. See: [Recommendation Engine](06-breakdowns-advanced/06-recommendation-engine.md)
+
 **Asset-centric orchestration** — An orchestrator model (Dagster's) where each node is a dataset that should exist plus the function that builds it, so lineage, freshness and partitioned backfills attach to data. Contrast task-centric tools (Airflow, Prefect), where a node is a step. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
 
 **Asset (Airflow)** — A logical dataset that an Airflow task declares it updates; other DAGs can schedule on it instead of on a clock (data-aware scheduling). Called a dataset before Airflow 3. See: [Airflow](04-technology-deep-dives/03-airflow.md)
@@ -56,6 +58,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## C
 
+**Candidate generation** — The first stage of answering a recommendation request: cheaply picking a few hundred plausible items out of millions from several candidate sources (similar items, bought-together lists, trending), which a ranking model then scores. See: [Recommendation Engine](06-breakdowns-advanced/06-recommendation-engine.md)
+
 **Card testing** — A fraud attack where a script tries many stolen card numbers with small payments, usually from one device or IP, to find which still work. Per-card counts look normal; device and IP velocity features catch it. See: [Fraud Detection](06-breakdowns-advanced/03-fraud-detection.md)
 
 **Catchup** — The Airflow setting that makes the scheduler create a run for every missed interval since the start date. Off by default in Airflow 3. See: [Airflow](04-technology-deep-dives/03-airflow.md)
@@ -75,6 +79,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Classification tag** — A label on a column saying what kind of data it holds (`pii.email`, `restricted.region`), set at onboarding, suggested by scanners and inherited through lineage, so access policies can be written against tags instead of tables. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Clustering** — Ordering rows inside each partition by another column (also called sorting) so that queries filtering on it can skip blocks using min/max statistics. It is the fine cut after partitioning's coarse one, and it decays as unsorted data arrives. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Co-occurrence list** — For each item, the other items most often bought or viewed in the same sessions, with a score; a precomputed "bought together" candidate source looked up by key at request time. See: [Recommendation Engine](06-breakdowns-advanced/06-recommendation-engine.md)
 
 **Columnar format** — A file format (such as Parquet) that stores each column's values together instead of one row at a time. It compresses well and lets a query read only the columns it needs. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
@@ -293,6 +299,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Late data** — An event that arrives after the system has already moved past its event time, for example a mobile event uploaded two hours after it happened. You must decide whether to drop it, include it in a correction, or hold results back to wait for it. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 **Late-arriving dimension** — A fact that references a dimension row (for example a customer) which has not been loaded yet. Handle it with an inferred placeholder member or a quarantine-and-retry table, not a join that silently drops the fact. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
+
+**Latency budget** — A request's time limit split into a share per step (store reads, candidate lookups, model), with independent steps run in parallel so the budget is the longest path, not the sum. The request-time counterpart of a freshness budget. See: [Recommendation Engine](06-breakdowns-advanced/06-recommendation-engine.md)
 
 **Ledger (append-only)** — A table where each row is one posting (+1 stream, or -1 for a reversal) tagged with the period it is reported in, and rows are never updated or deleted. A period's total is the sum of its rows, so corrections land in later periods and closed ones never change. See: [Music Streaming Analytics](06-breakdowns-advanced/01-music-streaming-analytics.md)
 
