@@ -14,6 +14,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Admission control** — Deciding, before a query or job starts, whether it may run now, must wait in a queue, or is refused, using limits such as per-tenant concurrency and an estimate of bytes to scan. It stops one tenant from taking a shared pool. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
 
+**Affinity (feed ranking)** — A score for a (viewer, author) pair built from the viewer's past interactions with that author (views, reactions, comments), computed in batch and read by the feed ranker. See: [Activity Feed](06-breakdowns-advanced/07-activity-feed.md)
+
 **Alert fatigue** — What happens when a team gets so many alerts that it stops acting on them, including the real ones. Measure it by checking how many of the last 30 pages needed a human. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
 **Allowed lateness** — Extra time a stream processor keeps a window's state after the watermark has passed it, so an event arriving in that period triggers a corrected result instead of being discarded. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
@@ -208,6 +210,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Federated governance** — Shared rules (identifier formats, privacy classes, contract standards) agreed by domain representatives and the platform team, and enforced automatically by the platform so data from different domains can be joined. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
+**Feed inbox** — A per-member list of activity IDs waiting to be ranked, newest first, filled by fan-out on write and kept in a key-value store. It holds IDs, not scores, so a ranking change never rewrites it. See: [Activity Feed](06-breakdowns-advanced/07-activity-feed.md)
+
 **Feedback loop (recommendations)** — A model deciding what is shown, so training data contains only what it chose, so it keeps choosing the same things. Correcting for it needs logged positions, candidate samples and an exploration slice. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
 **Fact table** — A table with one row per event at a chosen grain (an order line, a click), holding numeric measures to add up plus keys that point to dimensions. See: [Data Model Design](01-the-framework/06-data-model-design.md)
@@ -215,6 +219,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Fail open / fail closed** — What a gate does when it cannot get an answer: fail open lets the data or request through unchecked, fail closed blocks it. Choose per consumer: fail closed where wrong is worse than late. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
 
 **Fan-out** — One input feeding many consumers or many downstream tasks, for example one Kafka topic read by five independent services. It multiplies reads, so plan capacity for the total, not for the single input. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
+**Fan-out on write / fan-out on read** — The two ways to deliver an activity to its audience's feeds. On write (push), a copy of its ID goes into every audience member's inbox when it is created, so reads are one lookup; on read (pull), each reader fetches recent activity from everyone they follow when they open the feed. See: [Activity Feed](06-breakdowns-advanced/07-activity-feed.md)
 
 **Freshness** — How old the newest data in a table or dashboard is compared with now, for example "no more than 15 minutes behind the source". One of the three common data SLAs, next to completeness and quality. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
@@ -248,7 +254,11 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Hot, warm and cold tiers** — Storing data at different price and speed points by age: the newest, most-read data on fast, expensive storage (a search index on SSD), older data on cheaper, slower storage (object storage, then an archive tier). Per-use retention requirements set the boundaries. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
+**Hybrid fan-out** — Pushing activities from ordinary authors into inboxes while pulling the few very large accounts' recent activities at read time, because that pulled set is small enough to keep in memory. See: [Activity Feed](06-breakdowns-advanced/07-activity-feed.md)
+
 **HyperLogLog (HLL)** — A sketch that estimates the number of distinct values in a stream (unique visitors) from per-bucket maxima of hashed leading zeros. About 12 KB gives roughly 0.8% standard error at any scale, and two sketches merge into the sketch of their union, so daily counts combine over any range. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
+
+**Hysteresis** — Using two thresholds instead of one (switch on above 100,000, back off only below 80,000) so a value hovering near the line does not flip a system between modes. See: [Activity Feed](06-breakdowns-advanced/07-activity-feed.md)
 
 ## I
 
