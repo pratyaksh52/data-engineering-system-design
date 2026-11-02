@@ -112,6 +112,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Consumer lag** — For a Kafka partition, the latest offset minus the group's committed offset: how far behind the consumers are. Rising lag is the main health signal of a streaming pipeline. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
+**Control plane / data plane** — A platform's control plane is the services that create and change things (CI, provisioner, registry); its data plane is what stores, moves and serves data. Keeping them separate means a control-plane outage blocks changes but not queries. See: [Data Mesh Platform](06-breakdowns-advanced/09-data-mesh-platform.md)
+
 **Copy-on-write** — Handling an update or delete by rewriting every data file that holds an affected row, so reads stay plain and fast but writes are expensive. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Cost attribution** — Working out what each tenant or team costs: direct costs from resources tagged to them, shared costs split by metered usage, and the unallocated rest reported as its own number. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
@@ -147,6 +149,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Data mesh** — An organisational pattern where domain teams own their analytical data as products, a self-serve platform makes that cheap, and federated governance keeps the products combinable. Worth it only with many domains and a bottlenecked central team. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Data product** — A dataset published by a domain team as a product: a named owner, a contract, a catalog entry and a service level, for consumers who can rely on it. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
+
+**Data product descriptor** — One declarative file per data product (owner, tier, inputs, build step, output ports with contracts, classification, retention) that a mesh platform validates and compiles into storage, pipeline, policies, checks and a catalog entry. See: [Data Mesh Platform](06-breakdowns-advanced/09-data-mesh-platform.md)
 
 **Data profile** — Summary metrics for one partition (row count, null rate per column, approximate distinct counts, min, max and mean), computed in one query and stored as history so rule and anomaly checks compare against it instead of re-reading data. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
 
@@ -241,6 +245,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Geo-bucketing** — Mapping every location (latitude, longitude) to a fixed cell of a map grid, so "per area" becomes a key you can group and partition by. The cell size trades local detail against counts too small to be stable. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
 
 **Geohash** — A public scheme that encodes a latitude-longitude rectangle as a short string, with longer strings for smaller rectangles. Cheap and stable, but cells change real size with latitude and neighbours sit at uneven distances. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
+
+**Global type** — A company-wide identifier or unit (`customer_id`, `currency_code`, amounts in minor units) with a fixed format and an owning domain, referenced by contracts and checked at publish so products from different domains can be joined. See: [Data Mesh Platform](06-breakdowns-advanced/09-data-mesh-platform.md)
 
 **Grain** — What exactly one row in a table represents, such as "one order line" or "one user per day". Decide the grain first; every column and every join follows from it. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
@@ -390,6 +396,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Outbox pattern** — Writing a business event into an `outbox` table in the same database transaction as the data change, and letting CDC publish it. It avoids the dual write, where a crash between the database and the message queue loses or invents events. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
+**Output port** — The part of a data product that consumers may read (a table, view or topic), each with its own contract and major version. Everything else the domain builds stays private, so it can change without asking anyone. See: [Data Mesh Platform](06-breakdowns-advanced/09-data-mesh-platform.md)
+
 ## P
 
 **Partition** — A slice of a dataset or stream, chosen by a key or a range, that can be stored and processed independently. Partitions are how data systems spread work across machines and skip data they don't need. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -401,6 +409,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Partition pruning** — The engine dropping every partition that cannot match a query's filter before reading any data. It only works when the filter is on the partition column itself, not a function of it. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 **Point-in-time join** — Attaching to each label row the newest feature value that was already available at the label's timestamp, bounded by a TTL. It prevents data leakage. Also called an as-of join. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
+**Policy as code** — Governance rules written as versioned, testable code in a repository, run automatically by the platform at CI, publish and nightly scans, with each rule marked blocking or warning. See: [Data Mesh Platform](06-breakdowns-advanced/09-data-mesh-platform.md)
 
 **Pooled model** — A multi-tenant layout where all tenants share the same tables and compute, and a `tenant_id` column on every row says whose it is. Cheapest to run; isolation depends on row-level security and per-tenant quotas. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
 
