@@ -54,6 +54,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Checkpoint barrier** — A marker Flink injects into the data stream; when an operator sees it, everything before belongs to that checkpoint, so the job gets a consistent snapshot without stopping. See: [Flink](04-technology-deep-dives/08-flink.md)
 
+**Classification tag** — A label on a column saying what kind of data it holds (`pii.email`, `restricted.region`), set at onboarding, suggested by scanners and inherited through lineage, so access policies can be written against tags instead of tables. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
+
 **Clustering** — Ordering rows inside each partition by another column (also called sorting) so that queries filtering on it can skip blocks using min/max statistics. It is the fine cut after partitioning's coarse one, and it decays as unsorted data arrives. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
 **Columnar format** — A file format (such as Parquet) that stores each column's values together instead of one row at a time. It compresses well and lets a query read only the columns it needs. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
@@ -80,6 +82,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Count-Min Sketch** — A small grid of counters for estimating how often each key appears in a huge stream: each key increments one counter per row, and its estimate is the smallest of them. It never undercounts and may overcount by a bounded amount; paired with a heap it gives approximate top-K in fixed memory. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
+**Credential vending** — A catalog checking a user's permission on a table and handing the engine short-lived storage credentials scoped to that table's files, so no one needs broad bucket access. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
+
 **Credit** — Snowflake's billing unit for compute: the smallest virtual warehouse burns 1 credit per running hour and each size up doubles it, at roughly $2 to 4 per credit. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
 **Cube** — Pre-computed aggregates for every combination of a set of dimensions, so any filter-and-group question becomes a lookup. With many dimensions or high-cardinality ones (merchant, issuer) the combinations explode, which is why live dashboards aggregate unplanned questions at query time instead. See: [Real-Time Dashboard](05-breakdowns-core/04-real-time-dashboard.md)
@@ -94,11 +98,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Data fabric** — A metadata-driven layer across existing data systems that gives one place to discover, understand, access and govern data where it lives. Its parts (catalog, automated lineage, federated query, central policy) are useful; the name is largely vendor packaging. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
 
+**Data lake** — Tables stored as open files (usually Parquet) in object storage, organized by a table format and read by several query engines. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
+
 **Data lineage** — A record of where data came from and what was built from it: which sources feed which tables, which jobs produced them and which dashboards and models read them. Walk it downstream for impact analysis and upstream for debugging. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
 
 **Data mesh** — An organisational pattern where domain teams own their analytical data as products, a self-serve platform makes that cheap, and federated governance keeps the products combinable. Worth it only with many domains and a bottlenecked central team. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Data product** — A dataset published by a domain team as a product: a named owner, a contract, a catalog entry and a service level, for consumers who can rely on it. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
+
+**Data swamp** — A data lake nobody can trust or navigate: files dumped into folders with no transactions, schemas, owners or catalog. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Data virtualization** — Querying data in place across several systems through one SQL interface (a federated query) instead of copying it first. Good for exploration and light joins; heavy or frequent joins should be materialised. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
 
@@ -178,6 +186,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Idempotent** — An operation that gives the same end result whether it runs once or many times. Idempotent pipeline steps can be retried or replayed safely. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
+**Identity map** — A silver table that maps every identifier a person has across sources (app user ID, payment customer ID, CRM contact, email) to one internal surrogate key. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
+
 **In-sync replicas (ISR)** — The Kafka partition leader plus the followers that are caught up with it. A message counts as committed once all of them have it, and only an ISR member can become the new leader. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Incremental load** — Reading only the rows that are new or changed since the last run, usually with a watermark column. Cheaper per run than a full load, but it misses hard deletes unless handled. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
@@ -204,7 +214,11 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## L
 
+**Lakehouse** — A data lake with warehouse-style tables, transactions and governance on top, provided by a table format and a catalog. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
+
 **Lambda architecture** — Running a slow, exact batch layer and a fast, approximate speed layer over the same events, with a serving layer that merges them at a cutoff time. It buys correctness and freshness at the price of the same logic in two codebases. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
+
+**Landing zone** — A plain object-storage area where files are kept exactly as received, before any loading, so a failed parse can always be retried from the original. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Late data** — An event that arrives after the system has already moved past its event time, for example a mobile event uploaded two hours after it happened. You must decide whether to drop it, include it in a correction, or hold results back to wait for it. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
@@ -223,6 +237,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## M
 
 **Manifest** — In Iceberg, a metadata file listing data files with their partition values, row counts and per-column min/max bounds, so a query can skip files without opening them. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
+
+**Masking policy** — A rule, enforced by the query engine, that rewrites a column's values at query time (a hash or `***`) for users who are not allowed to see them. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Materialization** — In dbt, how a model's query result is stored: as a view, a table, an incremental table, or a warehouse-maintained materialized view. Choosing it is a cost and freshness decision. See: [dbt](04-technology-deep-dives/04-dbt.md)
 
@@ -278,6 +294,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Projection** — A read-optimised table calculated from an event log by a process that subscribes to it. It is disposable: fix the logic, empty it and replay the log to rebuild. See: [Event Sourcing](03-architecture-patterns/05-event-sourcing.md)
 
+**Pseudonymization** — Replacing identifying values with a key that only a separate, protected table can link back to a person, so deleting that link cuts the connection in every other table. The data may still count as personal data in law, so confirm with legal. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
+
 ## Q
 
 **Quarantine table** — A side table that holds records which failed validation, with the reason attached, so bad rows are visible and fixable instead of silently dropped. See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
@@ -311,6 +329,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Reverse ETL** — Reading a warehouse table or query result and writing it into operational tools (CRM, ad platform, email tool) through their APIs, usually as a scheduled diff-and-upsert sync. See: [Reverse ETL](03-architecture-patterns/09-reverse-etl.md)
 
 **Rollup** — A pre-computed aggregate at a fixed grain (clicks per link per minute or per day), so a dashboard reads a few rows instead of scanning raw events. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
+
+**Row filter** — A rule, enforced by the query engine, that adds a condition to every query on a table so each user sees only the rows they are allowed to (for example, their own region). See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Runbook** — A short document tied to one alert: what it means, how to confirm it, likely causes, fixes and who to escalate to. It lets a tired on-call engineer act without reading code. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
