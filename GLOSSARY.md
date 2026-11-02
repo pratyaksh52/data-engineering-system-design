@@ -35,6 +35,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Below the line** — Explicitly out of scope. In the framework you list your requirements, draw a line under them, and write what you are deliberately not building beneath it. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
 **Blast radius** — How much breaks when one thing breaks. A platform keeps it small by design, for example one generated DAG file per pipeline so a bad config takes out one pipeline, not thousands. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
 
+**Blocking check** — A data quality check whose failure stops a partition from being published (and holds what depends on it); a warning check publishes and flags instead. Block on what is never acceptable, warn on what is merely unusual. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
+
 **Bloom filter** — A compact structure that answers "have I seen this key?" with "definitely not" or "probably yes". It never forgets a key but has a tunable false-positive rate, so it fits approximate dedup, not payments. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 **Broadcast join** — A join where the small table is copied to every executor so the big table is never shuffled. Fast, but the small side must fit in memory. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
@@ -116,6 +118,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Data product** — A dataset published by a domain team as a product: a named owner, a contract, a catalog entry and a service level, for consumers who can rely on it. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
+**Data profile** — Summary metrics for one partition (row count, null rate per column, approximate distinct counts, min, max and mean), computed in one query and stored as history so rule and anomaly checks compare against it instead of re-reading data. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
+
 **Data swamp** — A data lake nobody can trust or navigate: files dumped into folders with no transactions, schemas, owners or catalog. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Data virtualization** — Querying data in place across several systems through one SQL interface (a federated query) instead of copying it first. Good for exploration and light joins; heavy or frequent joins should be materialised. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
@@ -125,6 +129,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Deferrable operator** — An Airflow operator or sensor that hands its waiting to a single async process (the triggerer) so it holds no worker slot while it waits. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Dead-letter queue (DLQ)** — A separate topic or table where records that cannot be processed are set aside, with the error reason, so the main flow keeps running. Alert on its rate, fix the cause, then replay the records. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
+
+**Dead man's switch** — An alert that fires when an expected signal stops arriving (a heartbeat, a stream of check results), so monitoring that silently stopped running is noticed. Run it from outside the system it watches. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
 
 **Dedup key** — The column or columns that identify one real-world event, so two records with the same key count as one. Best created at the source before any retry. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
@@ -175,6 +181,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Federated governance** — Shared rules (identifier formats, privacy classes, contract standards) agreed by domain representatives and the platform team, and enforced automatically by the platform so data from different domains can be joined. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Fact table** — A table with one row per event at a chosen grain (an order line, a click), holding numeric measures to add up plus keys that point to dimensions. See: [Data Model Design](01-the-framework/06-data-model-design.md)
+
+**Fail open / fail closed** — What a gate does when it cannot get an answer: fail open lets the data or request through unchecked, fail closed blocks it. Choose per consumer: fail closed where wrong is worse than late. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
 
 **Fan-out** — One input feeding many consumers or many downstream tasks, for example one Kafka topic read by five independent services. It multiplies reads, so plan capacity for the total, not for the single input. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
@@ -479,3 +487,5 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Workflow service (cloud-native)** — A managed state-machine or pipeline service from a cloud (for example Step Functions, Cloud Workflows, Data Factory) that calls other services with nothing to host. Strong for glue between services, weak at dated backfills and lineage. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
 
 **Write-ahead log (WAL)** — The file where a database records every change before applying it, so it can recover after a crash and feed replicas. Log-based CDC reads it (Postgres: WAL, MySQL: binlog). See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
+
+**Write-audit-publish (WAP)** — Writing new data where consumers cannot see it (a staging location, a branch or a staged snapshot), running quality checks on it there, and publishing it in one atomic step only if they pass. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
