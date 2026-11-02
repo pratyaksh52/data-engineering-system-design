@@ -12,6 +12,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Adaptive query execution (AQE)** — Spark's runtime re-optimization, on by default since 3.2: it uses real shuffle sizes to merge small partitions, switch a join to broadcast, and split skewed join partitions. It does not fix a skewed group-by. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
+**Admission control** — Deciding, before a query or job starts, whether it may run now, must wait in a queue, or is refused, using limits such as per-tenant concurrency and an estimate of bytes to scan. It stops one tenant from taking a shared pool. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
+
 **Alert fatigue** — What happens when a team gets so many alerts that it stops acting on them, including the real ones. Measure it by checking how many of the last 30 pages needed a human. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
 **Allowed lateness** — Extra time a stream processor keeps a window's state after the watermark has passed it, so an event arriving in that period triggers a corrected result instead of being discarded. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
@@ -40,6 +42,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Blocking check** — A data quality check whose failure stops a partition from being published (and holds what depends on it); a warning check publishes and flags instead. Block on what is never acceptable, warn on what is merely unusual. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
 
 **Bloom filter** — A compact structure that answers "have I seen this key?" with "definitely not" or "probably yes". It never forgets a key but has a tunable false-positive rate, so it fits approximate dedup, not payments. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
+
+**Bridge model** — A multi-tenant layout that pools most tenants on shared tables and compute and silos a few (the largest, or those whose contracts require it), with each tenant's tier kept as data in a registry so the code stays the same. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
 
 **Broadcast join** — A join where the small table is copied to every executor so the big table is never shuffled. Fast, but the small side must fit in memory. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
@@ -96,11 +100,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Copy-on-write** — Handling an update or delete by rewriting every data file that holds an affected row, so reads stay plain and fast but writes are expensive. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
+**Cost attribution** — Working out what each tenant or team costs: direct costs from resources tagged to them, shared costs split by metered usage, and the unallocated rest reported as its own number. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
+
 **Count-Min Sketch** — A small grid of counters for estimating how often each key appears in a huge stream: each key increments one counter per row, and its estimate is the smallest of them. It never undercounts and may overcount by a bounded amount; paired with a heap it gives approximate top-K in fixed memory. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
 **Credential vending** — A catalog checking a user's permission on a table and handing the engine short-lived storage credentials scoped to that table's files, so no one needs broad bucket access. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Credit** — Snowflake's billing unit for compute: the smallest virtual warehouse burns 1 credit per running hour and each size up doubles it, at roughly $2 to 4 per credit. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
+
+**Crypto-shredding** — Deleting data by deleting the encryption key it was stored under, so every remaining copy, including backups and unexpired snapshots, becomes unreadable. Practical when a tenant has its own key. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
 
 **Cube** — Pre-computed aggregates for every combination of a set of dimensions, so any filter-and-group question becomes a lookup. With many dimensions or high-cardinality ones (merchant, issuer) the combinations explode, which is why live dashboards aggregate unplanned questions at query time instead. See: [Real-Time Dashboard](05-breakdowns-core/04-real-time-dashboard.md)
 
@@ -364,6 +372,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Point-in-time join** — Attaching to each label row the newest feature value that was already available at the label's timestamp, bounded by a TTL. It prevents data leakage. Also called an as-of join. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
 
+**Pooled model** — A multi-tenant layout where all tenants share the same tables and compute, and a `tenant_id` column on every row says whose it is. Cheapest to run; isolation depends on row-level security and per-tenant quotas. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
+
 **Posting period** — The accounting month a financial event is booked in: its own month if still open, otherwise the current open month, so a closed month never changes. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
 
 **Pro-rata payout** — A royalty model where each month's money in a market is split by stream share, so a counting error on one track moves money away from every other rights holder in that market. See: [Music Streaming Analytics](06-breakdowns-advanced/01-music-streaming-analytics.md)
@@ -412,6 +422,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Row filter** — A rule, enforced by the query engine, that adds a condition to every query on a table so each user sees only the rows they are allowed to (for example, their own region). See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
+**Row-level security (RLS)** — The query engine enforcing, row by row, who may read what, usually through a row filter; on a pooled multi-tenant table, one filter such as `tenant_id = current_tenant()`, with the tenant taken from the session rather than the query. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
+
 **Runbook** — A short document tied to one alert: what it means, how to confirm it, likely causes, fixes and who to escalate to. It lets a tired on-call engineer act without reading code. See: [Monitoring and Alerting](02-core-concepts/06-monitoring-and-alerting.md)
 
 ## S
@@ -441,6 +453,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Serving layer** — The final tables or stores that consumers read, kept small and shaped for their questions so internal changes do not break them. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Sessionization** — Grouping one user's events into sessions, closing a session after a gap of inactivity (such as 30 minutes), so raw heartbeats or clicks become one row per visit or viewing. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
+
+**Siloed model** — A multi-tenant layout where a tenant gets its own tables, compute and sometimes encryption key. Strong isolation and simple deletion, but too costly to give every small tenant. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
 
 **Sketch** — A small, fixed-size data structure that summarizes a large stream and answers one question approximately, such as HyperLogLog for distinct counts or Count-Min Sketch for frequencies, trading a known error for far less memory. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
@@ -480,6 +494,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Task-centric orchestration** — An orchestrator model (Airflow's, Prefect's) where each node is a unit of work and you define the order between steps; the datasets they change are implicit unless you add metadata. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
 
+**Tenant** — One customer (or team) of a shared platform whose data, access and costs must be kept separate from every other's. A platform serving many from shared infrastructure is multi-tenant. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
+
 **Throughput** — How much data a component moves per unit of time, such as MB/s per Kafka partition or events/s per pipeline. Compare with latency, which is how long one operation takes. See: [Key DE Numbers](02-core-concepts/10-key-de-numbers.md)
 
 **Topic** — A named stream of messages in Kafka, split into partitions. Producers append to it and consumer groups read from it. See: [Kafka](04-technology-deep-dives/02-kafka.md)
@@ -495,6 +511,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Time travel** — Reading a table as of an earlier version or timestamp, possible while the old log entries and data files still exist (about 7 days by default in Delta Lake). See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Tiered storage** — A message-log feature that offloads older segments to object storage and reads them back on demand, so replay can reach further back than broker disks allow, at slower read speed. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
+
+**Token bucket** — A rate limiter: a counter that refills at the allowed rate up to a maximum burst, where each request takes a token and an empty bucket means throttle. Used for per-tenant ingest quotas. See: [Multi-Tenant Platform](06-breakdowns-advanced/05-multi-tenant-platform.md)
 
 **Tombstone** — A message with a key and an empty value, which tells a compacted Kafka topic to eventually forget that key. CDC tools emit one after a delete event. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
