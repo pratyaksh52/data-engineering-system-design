@@ -178,6 +178,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Delta Lake** — An open table format that adds a transaction log beside Parquet files in object storage, giving atomic commits, versions, schema enforcement and row-level updates. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
+**Downsampling** — Storing lower-resolution summaries of older time-series data (one row per device per 5 minutes or per hour instead of every reading), so long-range charts stay fast and cheap. The summaries must be recomputed when late data touches them. See: [IoT Sensor Pipeline](06-breakdowns-advanced/10-iot-sensor-pipeline.md)
+
 ## E
 
 **Dimension** — A table describing the things an event involved (customer, product, delivery slot). Dimensions are small and descriptive; you filter and group by their columns. Compare with fact table. See: [Data Model Design](01-the-framework/06-data-model-design.md)
@@ -356,6 +358,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Merge-on-read** — Handling an update or delete by writing a small delete file beside the untouched data file, so writes are cheap and readers apply the deletes until compaction. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
+**Mergeable aggregate** — A summary value that smaller buckets can be combined into exactly, without the raw data: min, max, sum, count, and sketches built to merge. An average or a percentile is not mergeable, so store its parts instead. See: [IoT Sensor Pipeline](06-breakdowns-advanced/10-iot-sensor-pipeline.md)
+
 **Message log** — A durable, ordered, replayable queue of events (Kafka is the common one). Consumers read at their own pace and can re-read from an earlier point, which makes recovery and reprocessing possible. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Micro-batch** — Processing a stream as a series of small batch jobs, one every few seconds or minutes, each picking up where the last stopped. Trades a latency floor for simplicity and easy recovery. See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
@@ -363,6 +367,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Micro-partition** — Snowflake's automatic, immutable columnar file holding tens to hundreds of MB of rows, with min/max statistics per column that let queries skip it. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
 **Metadata catalog** — A searchable inventory of datasets with their schemas, owners and descriptions, often also storing the lineage graph. It is where people and tools look up what a table is and what depends on it. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
+
+**MQTT** — A lightweight publish/subscribe protocol for constrained devices on unreliable networks: each device holds one long-lived connection to a broker. Its quality-of-service level 1 delivers at least once, so duplicates must be removed downstream. See: [IoT Sensor Pipeline](06-breakdowns-advanced/10-iot-sensor-pipeline.md)
 
 ## N
 
@@ -444,6 +450,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Reconciliation** — Comparing your output with an independent source of truth (for example daily revenue against the payments provider's totals) and investigating any gap beyond a set tolerance. See: [Deep Dives](01-the-framework/08-deep-dives.md)
 
+**Reconnect storm** — Many devices reconnecting at once after an outage, each with buffered backlog, overloading connection brokers and burying live data. Handled with jittered backoff, newest-first upload and a throttled, separate backlog path. See: [IoT Sensor Pipeline](06-breakdowns-advanced/10-iot-sensor-pipeline.md)
+
 **Replay** — Re-reading stored events (from a message log offset or the raw layer) and processing them again with the same or fixed logic. Safe only when the writes are idempotent. See: [Backfill and Reprocessing](02-core-concepts/03-backfill-and-reprocessing.md)
 
 **Replication slot** — A bookmark in a database such as Postgres that makes it keep its change log until a CDC reader confirms it has consumed it. A stopped reader makes the log pile up and can fill the source's disk, so alert on slot lag. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
@@ -489,6 +497,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Speed layer** — The streaming half of a Lambda design: it computes approximate results for the recent past, until the batch layer's exact result replaces them. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
 
 **Self-serve data platform** — Shared tooling run by a platform team (storage, templates, catalog, access control, observability) that lets a domain team publish a data product without being an infrastructure expert. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
+
+**Series cardinality** — The number of distinct series (one metric of one device or entity) a time-series database tracks. Tag-indexed stores slow down as it grows, so tags must be stable identifiers, never per-trip or per-reading values. See: [IoT Sensor Pipeline](06-breakdowns-advanced/10-iot-sensor-pipeline.md)
 
 **Serving layer** — The final tables or stores that consumers read, kept small and shaped for their questions so internal changes do not break them. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
@@ -551,6 +561,10 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Trigger** — In Spark Structured Streaming, the setting that decides when the next micro-batch starts (as soon as possible, every N minutes, or once for everything available and then stop). See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
 
 **Time travel** — Reading a table as of an earlier version or timestamp, possible while the old log entries and data files still exist (about 7 days by default in Delta Lake). See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
+**Time-series database (TSDB)** — A store built for timestamped measurements that keeps each series sorted by time, compresses it heavily, and answers "this series, this time range" in milliseconds (TimescaleDB, InfluxDB, or ClickHouse with time-ordered tables). See: [IoT Sensor Pipeline](06-breakdowns-advanced/10-iot-sensor-pipeline.md)
+
+**Time-weighted average** — An average where each value counts for how long it held, not once per sample. Required for sensors that report only on change, such as a door that reports "opened" and "closed". See: [IoT Sensor Pipeline](06-breakdowns-advanced/10-iot-sensor-pipeline.md)
 
 **Tiered storage** — A message-log feature that offloads older segments to object storage and reads them back on demand, so replay can reach further back than broker disks allow, at slower read speed. See: [Kappa Architecture](03-architecture-patterns/02-kappa-architecture.md)
 
