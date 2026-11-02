@@ -164,6 +164,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## H
 
+**Heartbeat (CDC)** — A small table in the source database that a job updates every few seconds and the CDC pipeline captures, so the replication slot keeps advancing on quiet databases and the row's arrival downstream measures end-to-end freshness. See: [CDC Replication](05-breakdowns-core/05-cdc-replication.md)
+
 **Hidden partitioning** — Iceberg partitioning by a transform of a real column (such as `days(event_ts)`), so users filter on the real column and still get pruning, with no derived partition column to remember. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
 
 **Hot partition** — A partition that receives far more traffic or data than the others, usually because the partition key is skewed (one huge customer, one viral item). It becomes the bottleneck for the whole system. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -251,6 +253,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Offset** — The sequential number of a message within a Kafka partition; its address in that log. A consumer's progress is the offset it has read up to. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **OLAP (online analytical processing)** — Workloads that scan and aggregate large amounts of data to answer questions, such as "revenue by region by month". Column-oriented warehouses are built for it. Compare with OLTP, which handles many small reads and writes to individual rows. See: [Snowflake and Cloud Warehouses](04-technology-deep-dives/05-snowflake.md)
+
+**OLTP (online transaction processing)** — The workload of an application's own database: many small reads and writes of individual rows as users act. It is why analytics data is copied out rather than queried in place. See: [CDC Replication](05-breakdowns-core/05-cdc-replication.md)
 
 **Optimistic concurrency control** — Letting writers work without locks and checking for conflicts only at commit time; a writer retries if the winning commit touched nothing it read, and fails if it did. Delta Lake uses it. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
@@ -343,6 +347,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **SLA / SLO** — An SLO (service level objective) is a target you set for a measurable quality, such as "the daily table is ready by 07:00 on 99% of days". An SLA (service level agreement) is an SLO that has been promised to someone and usually has consequences if it is missed. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
 **Snapshot (dbt)** — A dbt feature that builds an SCD Type 2 table by comparing a mutable source to its own previous state on every run. It records only the changes it observes, so run frequency sets the history's resolution. See: [dbt](04-technology-deep-dives/04-dbt.md)
+
+**Snapshot generation** — A counter stamped on CDC events and rows that increases each time a table is re-snapshotted on a new log position, so data from the new snapshot always wins over leftovers whose log positions cannot be compared. See: [CDC Replication](05-breakdowns-core/05-cdc-replication.md)
 
 **Spill** — A task writing intermediate data to local disk because it ran out of execution memory. The job still finishes, slowly. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
