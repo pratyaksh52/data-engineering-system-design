@@ -4,6 +4,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## A
 
+**A/B test** — Showing a new version (such as a new ranking model) to a random slice of users and comparing outcomes with the current one. A model that wins offline and loses its A/B test often points to bad training data. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
+
 **Access pattern** — How a dataset will be read: which queries, by whom, how often, scanning a lot or looking up a little. It decides table layout and the serving store. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
 **Accumulating snapshot** — A fact table with one row per item moving through a fixed process (an order line from paid to shipped to delivered) and one timestamp column per milestone, filled in as each happens. It is the fact table you update in place. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
@@ -42,6 +44,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Broadcast join** — A join where the small table is copied to every executor so the big table is never shuffled. Fast, but the small side must fit in memory. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
 
 **Broker** — A server in a Kafka cluster that stores partitions and serves producers and consumers. A cluster is several brokers, so a partition can be copied to more than one. See: [Kafka](04-technology-deep-dives/02-kafka.md)
+
+**Bundle manifest** — A record that deploys an ML model together with the exact data versions it was trained with (catalog snapshot, feature view versions, label version), so serving never mixes a model with data from another version. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
 **Bus matrix** — A grid of which fact tables use which dimensions. It shows at a glance which dimensions must be conformed so numbers from different facts line up. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
 
@@ -156,6 +160,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Egress** — Data leaving a cloud provider, region or zone, billed per GB (about $0.05 to 0.09 for internet egress, about $0.01 across zones). It is invisible in a diagram and obvious on the bill. See: [Cost Optimization](02-core-concepts/05-cost-optimization.md)
 
+**Embedding** — A list of numbers (often about 128) a model learns for each item, such as a title, so that similar items get similar numbers. Values from different training runs are not comparable, so embeddings must be versioned. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
+
 **Event time** — The moment an event actually happened, as recorded by the source (for example, when a user tapped "buy"). Compare with processing time. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 **Event sourcing** — Storing every change as an immutable, business-named event and treating the current state as something calculated from those events. CDC derives events from state; event sourcing derives state from events. See: [Event Sourcing](03-architecture-patterns/05-event-sourcing.md)
@@ -179,6 +185,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Feature view** — A group of features on one entity, from one source, computed and materialized together; the unit of scheduling and storage in a feature store. Also called a feature group. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
 
 **Federated governance** — Shared rules (identifier formats, privacy classes, contract standards) agreed by domain representatives and the platform team, and enforced automatically by the platform so data from different domains can be joined. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
+
+**Feedback loop (recommendations)** — A model deciding what is shown, so training data contains only what it chose, so it keeps choosing the same things. Correcting for it needs logged positions, candidate samples and an exploration slice. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
 **Fact table** — A table with one row per event at a chosen grain (an order line, a click), holding numeric measures to add up plus keys that point to dimensions. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
@@ -224,6 +232,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Identity map** — A silver table that maps every identifier a person has across sources (app user ID, payment customer ID, CRM contact, email) to one internal surrogate key. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
+**Impression** — One item shown to one user at one position on one page, at one moment. Impressions that were played or clicked become positive training examples; those ignored become negatives. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
+
 **In-sync replicas (ISR)** — The Kafka partition leader plus the followers that are caught up with it. A message counts as committed once all of them have it, and only an ISR member can become the new leader. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Incremental load** — Reading only the rows that are new or changed since the last run, usually with a watermark column. Cheaper per run than a full load, but it misses hard deletes unless handled. See: [Ingestion Patterns](02-core-concepts/02-ingestion-patterns.md)
@@ -251,6 +261,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## L
 
 **Label (ML)** — The outcome a model learns to predict (was this payment fraud?), attached to each training example with the entity keys and the time the prediction would have been made. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
+**Label window** — How long after a prediction or impression you wait before its label is final (such as "played within 24 hours"). Until it closes, a negative only means "not yet". It sets when a training partition can be built. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
 **Lakehouse** — A data lake with warehouse-style tables, transactions and governance on top, provided by a table format and a catalog. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
@@ -299,6 +311,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## N
 
 **Natural key** — The identifier the source system uses for a thing (`customer_id`). It stays the same across all of a dimension's SCD Type 2 versions. Compare surrogate key. See: [Data Model Design](01-the-framework/06-data-model-design.md)
+
+**Negative sampling** — Keeping every positive training example but only a deterministic sample of negatives, each with a weight that undoes the sampling, so training sets stay a manageable size. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
 **Noisy neighbour** — One tenant of a shared system using so much of it (slots, queries, I/O) that other tenants slow down. Fixed with per-tenant quotas, priorities and separating heavy work such as backfills. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
 
@@ -411,6 +425,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Self-serve data platform** — Shared tooling run by a platform team (storage, templates, catalog, access control, observability) that lets a domain team publish a data product without being an infrastructure expert. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
 **Serving layer** — The final tables or stores that consumers read, kept small and shaped for their questions so internal changes do not break them. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
+
+**Sessionization** — Grouping one user's events into sessions, closing a session after a gap of inactivity (such as 30 minutes), so raw heartbeats or clicks become one row per visit or viewing. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
 **Sketch** — A small, fixed-size data structure that summarizes a large stream and answers one question approximately, such as HyperLogLog for distinct counts or Count-Min Sketch for frequencies, trading a known error for far less memory. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
 
