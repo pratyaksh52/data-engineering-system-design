@@ -33,6 +33,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Bad → Good → Great** — A way to compare options for one design decision: a Bad option that fails a requirement, a Good one that works with known gaps, and a Great one that closes the gaps at a stated cost. Choose the level your requirements justify, not the highest. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Below the line** — Explicitly out of scope. In the framework you list your requirements, draw a line under them, and write what you are deliberately not building beneath it. See: [The Delivery Framework](01-the-framework/02-delivery-framework.md)
+**Blast radius** — How much breaks when one thing breaks. A platform keeps it small by design, for example one generated DAG file per pipeline so a bad config takes out one pipeline, not thousands. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
+
 **Bloom filter** — A compact structure that answers "have I seen this key?" with "definitely not" or "probably yes". It never forgets a key but has a tunable false-positive rate, so it fits approximate dedup, not payments. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 **Broadcast join** — A join where the small table is copied to every executor so the big table is never shuffled. Fast, but the small side must fit in memory. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
@@ -54,6 +56,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Checkpoint barrier** — A marker Flink injects into the data stream; when an operator sees it, everything before belongs to that checkpoint, so the job gets a consistent snapshot without stopping. See: [Flink](04-technology-deep-dives/08-flink.md)
 
+**Circuit breaker** — A switch that, after repeated failures against one dependency, stops sending it requests for a while and probes until it recovers, instead of letting every caller retry. It turns one outage into one alert and a controlled resume. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
+
 **Classification tag** — A label on a column saying what kind of data it holds (`pii.email`, `restricted.region`), set at onboarding, suggested by scanners and inherited through lineage, so access policies can be written against tags instead of tables. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Clustering** — Ordering rows inside each partition by another column (also called sorting) so that queries filtering on it can skip blocks using min/max statistics. It is the fine cut after partitioning's coarse one, and it decays as unsorted data arrives. See: [Partitioning](02-core-concepts/01-partitioning.md)
@@ -67,6 +71,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Compatibility mode** — The rule a schema registry enforces when a new schema version is registered. BACKWARD means new-schema readers can read old data, FORWARD means old-schema readers can read new data, FULL means both, and the transitive variants check against every earlier version instead of only the latest. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
 
 **Completeness** — The share of the data you expected that has actually arrived, for example "99.9% of yesterday's events are loaded". One of the three common data SLAs, next to freshness and quality. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
+
+**Config-driven pipeline** — A pipeline a team describes in a short declarative file (inputs, steps, checks, outputs, schedule, owner) that a framework compiles into a running, monitored pipeline, so the team writes no orchestration code. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
 
 **Conformed** — Made consistent across sources: the same currency format, UTC timestamps and one customer ID wherever the concept appears. It is the main job of the silver layer. See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
 
@@ -95,6 +101,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Data interval** — The slice of event time an orchestrator run is responsible for (for example Oct 31 00:00 to Nov 1 00:00), independent of when the run actually starts. Reading it, not the clock, keeps reruns and backfills correct. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **Data contract** — An explicit, versioned agreement between a data producer and its consumers about a dataset's schema, meaning, quality and delivery expectations. Its purpose is to make breaking changes visible before they reach consumers. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
+
+**Data diff** — A comparison of a changed pipeline's output with production's output for the same interval (row counts, keys added or lost, column sums and null rates), shown on the pull request so reviewers see the effect of a change, not only the code. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
 
 **Data fabric** — A metadata-driven layer across existing data systems that gives one place to discover, understand, access and govern data where it lives. Its parts (catalog, automated lineage, federated query, central policy) are useful; the name is largely vendor packaging. See: [Data Fabric](03-architecture-patterns/07-data-fabric.md)
 
@@ -257,6 +265,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## N
 
 **Natural key** — The identifier the source system uses for a thing (`customer_id`). It stays the same across all of a dimension's SCD Type 2 versions. Compare surrogate key. See: [Data Model Design](01-the-framework/06-data-model-design.md)
+
+**Noisy neighbour** — One tenant of a shared system using so much of it (slots, queries, I/O) that other tenants slow down. Fixed with per-tenant quotas, priorities and separating heavy work such as backfills. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
 
 **Non-functional requirement (NFR)** — A measurable quality of how well a system does its job: freshness, completeness, correctness, retention, query speed, cost. It only counts as a requirement once it has a number. See: [Requirements Gathering](01-the-framework/03-requirements-gathering.md)
 
@@ -423,6 +433,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Upsert (MERGE)** — Writing a row if its key is new and updating it if the key already exists. Applying the same batch twice changes nothing, which makes it an idempotent write for tables of entities. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Z-order** — A layout that interleaves the sort order of several columns so rows close in all of them sit near each other, giving moderate data skipping on any of those columns. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Zero-copy clone** — A new table that shares the original's data files until either side changes, so a full-size copy for testing costs almost nothing to create. Offered by several warehouses and table formats. See: [ETL Framework](05-breakdowns-core/07-etl-framework.md)
 
 ## V
 
