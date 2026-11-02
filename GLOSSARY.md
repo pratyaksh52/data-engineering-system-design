@@ -262,6 +262,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Late-arriving dimension** — A fact that references a dimension row (for example a customer) which has not been loaded yet. Handle it with an inferred placeholder member or a quarantine-and-retry table, not a join that silently drops the fact. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
+**Ledger (append-only)** — A table where each row is one posting (+1 stream, or -1 for a reversal) tagged with the period it is reported in, and rows are never updated or deleted. A period's total is the sum of its rows, so corrections land in later periods and closed ones never change. See: [Music Streaming Analytics](06-breakdowns-advanced/01-music-streaming-analytics.md)
+
 **Liquid clustering** — A Delta Lake layout feature (`CLUSTER BY`) that clusters data incrementally on chosen keys and lets you change the keys later without rewriting the table; it replaces partitioning and Z-order on new tables. Availability is version-dependent. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
 **Local-global aggregation** — Pre-aggregating partial results (counts, sketches) on each upstream worker for a short interval before sending them to the worker that owns the key, so one hot key receives a few partials instead of every event. Works only for mergeable aggregates. Also called two-phase aggregation. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
@@ -337,6 +339,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Point-in-time join** — Attaching to each label row the newest feature value that was already available at the label's timestamp, bounded by a TTL. It prevents data leakage. Also called an as-of join. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
 
 **Posting period** — The accounting month a financial event is booked in: its own month if still open, otherwise the current open month, so a closed month never changes. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
+
+**Pro-rata payout** — A royalty model where each month's money in a market is split by stream share, so a counting error on one track moves money away from every other rights holder in that market. See: [Music Streaming Analytics](06-breakdowns-advanced/01-music-streaming-analytics.md)
 
 **Processing time** — The moment a system handles an event, as opposed to when it happened. Processing time is almost always later than event time, and the gap is what makes late data possible. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
