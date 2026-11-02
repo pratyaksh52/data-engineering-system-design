@@ -108,6 +108,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Data lake** — Tables stored as open files (usually Parquet) in object storage, organized by a table format and read by several query engines. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
+**Data leakage** — Training rows that contain information the model could not have had at prediction time, such as joining last year's labels to today's feature values. Offline metrics look better and production gets worse. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
 **Data lineage** — A record of where data came from and what was built from it: which sources feed which tables, which jobs produced them and which dashboards and models read them. Walk it downstream for impact analysis and upstream for debugging. See: [Data Lineage](02-core-concepts/04-data-lineage.md)
 
 **Data mesh** — An organisational pattern where domain teams own their analytical data as products, a self-serve platform makes that cheap, and federated governance keeps the products combinable. Worth it only with many domains and a bottlenecked central team. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
@@ -159,6 +161,16 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## F
 
 **Expand and contract** — A way to ship a breaking change safely: add the new field or version beside the old one, migrate every consumer, then remove the old one. See: [Data Contracts](02-core-concepts/07-data-contracts.md)
+
+**Feature (ML)** — An input value a model uses, describing an entity, such as a user's order count over the last 7 days. Each training example is a row of features plus a label. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
+**Feature logging** — Recording the exact feature values the serving path returned for each prediction (or a sample), so they can be checked against the offline store or joined to labels as training data. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
+**Feature registry** — The catalog of a feature store: every feature view's definition, entity, source, schedule, owner, version and consuming models. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
+**Feature store** — A shared system that defines each ML feature once and keeps two stores in agreement: an offline store of timestamped history for training and an online store of latest values for low-latency serving. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
+**Feature view** — A group of features on one entity, from one source, computed and materialized together; the unit of scheduling and storage in a feature store. Also called a feature group. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
 
 **Federated governance** — Shared rules (identifier formats, privacy classes, contract standards) agreed by domain representatives and the platform team, and enforced automatically by the platform so data from different domains can be joined. See: [Data Mesh](03-architecture-patterns/06-data-mesh.md)
 
@@ -222,6 +234,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## L
 
+**Label (ML)** — The outcome a model learns to predict (was this payment fraud?), attached to each training example with the entity keys and the time the prediction would have been made. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
 **Lakehouse** — A data lake with warehouse-style tables, transactions and governance on top, provided by a table format and a catalog. See: [Medallion Data Lake](05-breakdowns-core/06-medallion-data-lake.md)
 
 **Lambda architecture** — Running a slow, exact batch layer and a fast, approximate speed layer over the same events, with a serving layer that merges them at a cutoff time. It buys correctness and freshness at the price of the same logic in two codebases. See: [Lambda Architecture](03-architecture-patterns/01-lambda-architecture.md)
@@ -250,6 +264,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Materialization** — In dbt, how a model's query result is stored: as a view, a table, an incremental table, or a warehouse-maintained materialized view. Choosing it is a cost and freshness decision. See: [dbt](04-technology-deep-dives/04-dbt.md)
 
+**Materialization (feature store)** — Computing feature values and loading them into the offline and online stores. Distinct from dbt's materialization, which is how a model's result is stored. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
 **Medallion layers** — A way to organize a lakehouse into stages of increasing quality: bronze (raw as received), silver (cleaned and conformed) and gold (modeled for consumers). See: [Medallion Architecture](03-architecture-patterns/03-medallion-architecture.md)
 
 **Merge-on-read** — Handling an update or delete by writing a small delete file beside the untouched data file, so writes are cheap and readers apply the deletes until compaction. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
@@ -276,11 +292,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Observability** — Being able to answer "why is this unhealthy?" without guessing, using per-stage metrics, run history, lineage and logs. See: [Monitoring and SLAs](01-the-framework/09-monitoring-and-slas.md)
 
+**Offline store** — The half of a feature store that keeps the full history of feature values with timestamps, in cheap storage such as lake tables, for building training sets. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
 **Offset** — The sequential number of a message within a Kafka partition; its address in that log. A consumer's progress is the offset it has read up to. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **OLAP (online analytical processing)** — Workloads that scan and aggregate large amounts of data to answer questions, such as "revenue by region by month". Column-oriented warehouses are built for it. Compare with OLTP, which handles many small reads and writes to individual rows. See: [Snowflake and Cloud Warehouses](04-technology-deep-dives/05-snowflake.md)
 
 **OLTP (online transaction processing)** — The workload of an application's own database: many small reads and writes of individual rows as users act. It is why analytics data is copied out rather than queried in place. See: [CDC Replication](05-breakdowns-core/05-cdc-replication.md)
+
+**Online store** — The half of a feature store that keeps only the latest feature values per entity in a fast key-value store, read by models at inference time in milliseconds. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
 
 **Optimistic concurrency control** — Letting writers work without locks and checking for conflicts only at commit time; a writer retries if the winning commit touched nothing it read, and fails if it did. Delta Lake uses it. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
@@ -297,6 +317,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Partition overwrite** — Making a run replace exactly one partition of the output (for example one date) instead of appending to it, so a rerun gives the same result. The default idempotent write for dated batch outputs. See: [Pipeline Design](01-the-framework/07-pipeline-design.md)
 
 **Partition pruning** — The engine dropping every partition that cannot match a query's filter before reading any data. It only works when the filter is on the partition column itself, not a function of it. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Point-in-time join** — Attaching to each label row the newest feature value that was already available at the label's timestamp, bounded by a TTL. It prevents data leakage. Also called an as-of join. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
 
 **Posting period** — The accounting month a financial event is booked in: its own month if still open, otherwise the current open month, so a closed month never changes. See: [E-Commerce Warehouse](05-breakdowns-core/03-e-commerce-warehouse.md)
 
@@ -413,6 +435,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Topic** — A named stream of messages in Kafka, split into partitions. Producers append to it and consumer groups read from it. See: [Kafka](04-technology-deep-dives/02-kafka.md)
 
 **Trace ID** — An identifier attached to one user request as it passes through many services, so every log line that request produced can be pulled together. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
+
+**Training-serving skew** — Any difference between the feature values a model saw in training and those it receives in production, from two implementations, leakage, different freshness or bugs. It fails silently. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
 
 **Transaction log** — In Delta Lake, the ordered `_delta_log` of JSON commits (plus periodic checkpoints) listing which data files are added and removed; replaying it defines the table. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
 
