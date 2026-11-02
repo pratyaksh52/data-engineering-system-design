@@ -166,6 +166,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Embedding** — A list of numbers (often about 128) a model learns for each item, such as a title, so that similar items get similar numbers. Values from different training runs are not comparable, so embeddings must be versioned. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
+**Engagement** — Any action a user takes on a post or item: a like, reply, repost, quote or bookmark. On a social network each one is usually a row in a product table, so CDC from that table gives you likes and unlikes in commit order. See: [Social Media Analytics](06-breakdowns-advanced/04-social-media-analytics.md)
+
 **Event time** — The moment an event actually happened, as recorded by the source (for example, when a user tapped "buy"). Compare with processing time. See: [Late-Arriving Data](02-core-concepts/08-late-arriving-data.md)
 
 **Event sourcing** — Storing every change as an immutable, business-named event and treating the current state as something calculated from those events. CDC derives events from state; event sourcing derives state from events. See: [Event Sourcing](03-architecture-patterns/05-event-sourcing.md)
@@ -173,6 +175,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Exactly-once** — The effect of processing each event once, with no loss and no duplicates. In practice it is built from at-least-once delivery plus idempotent writes or transactions, not from a network that never repeats itself. See: [Deduplication at Scale](02-core-concepts/09-deduplication-at-scale.md)
 
 **Executor** — A Spark worker process with a few cores and some memory that runs tasks and holds cached and shuffle data. The driver schedules work onto executors. See: [Spark Internals](04-technology-deep-dives/01-spark-internals.md)
+
+**Exponential decay** — Keeping a count whose old contributions lose weight over time: each update multiplies the stored value by 2^(−elapsed / half-life) and adds the new weight, where the half-life is how long a contribution takes to lose half its weight. Two numbers per key replace a window of buckets, and decay can be applied lazily on the next update or read. See: [Social Media Analytics](06-breakdowns-advanced/04-social-media-analytics.md)
 
 ## F
 
@@ -225,6 +229,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Hot key** — A key that receives far more traffic than the others, so the one worker or partition that owns it becomes the bottleneck. Check each stage of a pipeline separately, since each is keyed differently; often the fix is to aggregate by an even key first and key by the skewed one only afterwards. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
 
 **Hot partition** — A partition that receives far more traffic or data than the others, usually because the partition key is skewed (one huge customer, one viral item). It becomes the bottleneck for the whole system. See: [Partitioning](02-core-concepts/01-partitioning.md)
+
+**Hot set** — The few thousand keys currently getting the most traffic (for example, the most-viewed posts this second), detected by the stream job that counts them and pushed to every serving instance so their reads never reach the shared store. See: [Social Media Analytics](06-breakdowns-advanced/04-social-media-analytics.md)
 
 **Hot, warm and cold tiers** — Storing data at different price and speed points by age: the newest, most-read data on fast, expensive storage (a search index on SSD), older data on cheaper, slower storage (object storage, then an archive tier). Per-use retention requirements set the boundaries. See: [Log Aggregation](05-breakdowns-core/01-log-aggregation.md)
 
@@ -378,6 +384,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 **Raw layer** — The first stored copy of data, kept close to how it arrived (also called bronze). It lets you rerun cleaning logic after a bug without asking the source to resend. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
+**Read-your-writes** — A guarantee that after you write something, your own next read sees it, even if other readers see it later. A client that shows its own change locally often removes the need for the pipeline to provide it. See: [Social Media Analytics](06-breakdowns-advanced/04-social-media-analytics.md)
+
 **Read replica** — A copy of a database kept in sync with the primary and used for reading, so heavy extracts or CDC do not slow the live application. See: [High-Level Architecture](01-the-framework/05-high-level-architecture.md)
 
 **Real-time OLAP store** — A columnar database (ClickHouse, Druid, Pinot) that ingests a stream continuously and answers many small aggregate queries in tens to hundreds of milliseconds, used to serve user-facing dashboards. See: [URL Shortener Analytics](05-breakdowns-core/02-url-shortener-analytics.md)
@@ -523,5 +531,7 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 **Workflow service (cloud-native)** — A managed state-machine or pipeline service from a cloud (for example Step Functions, Cloud Workflows, Data Factory) that calls other services with nothing to host. Strong for glue between services, weak at dated backfills and lineage. See: [Orchestrator Comparison](04-technology-deep-dives/10-orchestrator-comparison.md)
 
 **Write-ahead log (WAL)** — The file where a database records every change before applying it, so it can recover after a crash and feed replicas. Log-based CDC reads it (Postgres: WAL, MySQL: binlog). See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
+
+**Write-if-newer** — A write rule for derived values: each value carries a timestamp or version, and the store ignores a write older than what it already holds, so replays and late retries cannot move a value backwards. See: [Fraud Detection](06-breakdowns-advanced/03-fraud-detection.md)
 
 **Write-audit-publish (WAP)** — Writing new data where consumers cannot see it (a staging location, a branch or a staged snapshot), running quality checks on it there, and publishing it in one atomic step only if they pass. See: [Data Quality Monitoring](05-breakdowns-core/09-data-quality-monitoring.md)
