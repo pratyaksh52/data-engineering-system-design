@@ -52,11 +52,15 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## C
 
+**Card testing** — A fraud attack where a script tries many stolen card numbers with small payments, usually from one device or IP, to find which still work. Per-card counts look normal; device and IP velocity features catch it. See: [Fraud Detection](06-breakdowns-advanced/03-fraud-detection.md)
+
 **Catchup** — The Airflow setting that makes the scheduler create a run for every missed interval since the start date. Off by default in Airflow 3. See: [Airflow](04-technology-deep-dives/03-airflow.md)
 
 **CDC (change data capture)** — Reading a database's change log (inserts, updates and deletes) and streaming those changes to other systems, instead of repeatedly querying the tables. See: [CDC Patterns](03-architecture-patterns/04-cdc-patterns.md)
 
 **Change data feed (CDF)** — A Delta Lake option that records row-level changes (insert, update before and after, delete) on each write and exposes them for reading, so downstream jobs process only what changed. It starts from the version where it was enabled. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
+**Chargeback** — A payment reversed by the cardholder's bank after a dispute, such as "I didn't make this payment". Fraud chargebacks are the main fraud label and arrive weeks to about four months after the payment. See: [Fraud Detection](06-breakdowns-advanced/03-fraud-detection.md)
 
 **Checkpoint** — Durable storage where a streaming job records its progress (source offsets and operator state), so a restart resumes from the last good point instead of starting over. See: [Micro-Batch vs Streaming](03-architecture-patterns/08-micro-batch-vs-streaming.md)
 
@@ -261,6 +265,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## L
 
 **Label (ML)** — The outcome a model learns to predict (was this payment fraud?), attached to each training example with the entity keys and the time the prediction would have been made. See: [Feature Store](05-breakdowns-core/08-feature-store.md)
+
+**Label maturity** — The age after which a prediction's label is treated as settled, set from the measured label arrival curve (for fraud chargebacks, about 90 days). Training on younger rows mislabels recent positives as negatives. See: [Fraud Detection](06-breakdowns-advanced/03-fraud-detection.md)
 
 **Label window** — How long after a prediction or impression you wait before its label is final (such as "played within 24 hours"). Until it closes, a negative only means "not yet". It sets when a training partition can be built. See: [Video Recommendations](06-breakdowns-advanced/02-video-recommendations.md)
 
@@ -499,6 +505,8 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 ## V
 
 **VACUUM** — The Delta Lake command that physically deletes data files no longer referenced by the current version and older than the retention period (7 days by default). It ends time travel to the deleted versions. See: [Delta Lake](04-technology-deep-dives/06-delta-lake.md)
+
+**Velocity feature** — A count or sum over a recent time window per entity, such as payment attempts on this card in the last 10 minutes. The shortest windows may need computing inside the request so they include the previous event. See: [Fraud Detection](06-breakdowns-advanced/03-fraud-detection.md)
 
 **Virtual warehouse** — In Snowflake, a rented compute cluster that runs queries over shared storage; many can read the same tables without competing. See: [Snowflake](04-technology-deep-dives/05-snowflake.md)
 
