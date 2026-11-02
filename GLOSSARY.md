@@ -196,13 +196,21 @@ Every lesson defines its terms the first time it uses them. This page exists so 
 
 ## G
 
+**Geo-bucketing** — Mapping every location (latitude, longitude) to a fixed cell of a map grid, so "per area" becomes a key you can group and partition by. The cell size trades local detail against counts too small to be stable. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
+
+**Geohash** — A public scheme that encodes a latitude-longitude rectangle as a short string, with longer strings for smaller rectangles. Cheap and stable, but cells change real size with latitude and neighbours sit at uneven distances. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
+
 **Grain** — What exactly one row in a table represents, such as "one order line" or "one user per day". Decide the grain first; every column and every join follows from it. See: [Data Model Design](01-the-framework/06-data-model-design.md)
 
 ## H
 
+**H3** — An open-source grid that covers the Earth in hexagonal cells at 16 resolutions (resolution 8 averages about 0.74 km²), with a 64-bit ID per cell. Almost every cell has 6 edge-sharing neighbours at equal distance (12 per resolution are pentagons), and an approximate parent at the next coarser resolution. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
+
 **Heartbeat (CDC)** — A small table in the source database that a job updates every few seconds and the CDC pipeline captures, so the replication slot keeps advancing on quiet databases and the row's arrival downstream measures end-to-end freshness. See: [CDC Replication](05-breakdowns-core/05-cdc-replication.md)
 
 **Hidden partitioning** — Iceberg partitioning by a transform of a real column (such as `days(event_ts)`), so users filter on the real column and still get pruning, with no derived partition column to remember. See: [Apache Iceberg](04-technology-deep-dives/07-iceberg.md)
+
+**Hot key** — A key that receives far more traffic than the others, so the one worker or partition that owns it becomes the bottleneck. Check each stage of a pipeline separately, since each is keyed differently; often the fix is to aggregate by an even key first and key by the skewed one only afterwards. See: [Surge Pricing](05-breakdowns-core/10-surge-pricing.md)
 
 **Hot partition** — A partition that receives far more traffic or data than the others, usually because the partition key is skewed (one huge customer, one viral item). It becomes the bottleneck for the whole system. See: [Partitioning](02-core-concepts/01-partitioning.md)
 
