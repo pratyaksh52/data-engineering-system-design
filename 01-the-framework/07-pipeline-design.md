@@ -231,3 +231,4 @@ flowchart LR
 - [Backfill and Reprocessing](../02-core-concepts/03-backfill-and-reprocessing.md): rerunning history safely, and what it does to sources and consumers.
 - [Late-Arriving Data](../02-core-concepts/08-late-arriving-data.md): what a date-partition overwrite does when events for October 31 show up on November 2.
 - [Monitoring and SLAs](09-monitoring-and-slas.md): step 7, how you know these jobs are healthy and on time.
+- Related breakdowns: [Config-Driven ETL Framework](../05-breakdowns-core/07-etl-framework.md) and [Company-Wide Medallion Data Lake](../05-breakdowns-core/06-medallion-data-lake.md), both heavy on pipeline design.

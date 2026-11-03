@@ -185,3 +185,4 @@ If the prompt has personal data, financial reporting or many producing teams, mo
 - [Backfill and Reprocessing](03-backfill-and-reprocessing.md): lineage gives the rebuild order.
 - [Data Contracts](07-data-contracts.md): lineage shows who depends on a contract.
 - [Medallion Architecture](../03-architecture-patterns/03-medallion-architecture.md): the raw, cleaned and serving layers lineage traces across.
+- Related breakdowns: [Data Quality Monitoring Platform](../05-breakdowns-core/09-data-quality-monitoring.md), [Data Mesh Platform](../06-breakdowns-advanced/09-data-mesh-platform.md).

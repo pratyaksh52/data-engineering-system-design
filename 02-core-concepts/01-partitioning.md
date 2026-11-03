@@ -212,3 +212,5 @@ Salting has a cost you must say out loud:
 - Partitioning in the serving store, which follows different rules from the lake.
 
 Related lessons: [Data Model Design](../01-the-framework/06-data-model-design.md), [Key DE Numbers](10-key-de-numbers.md), [Ingestion Patterns](02-ingestion-patterns.md), [Cost Optimization](05-cost-optimization.md), [Apache Iceberg](../04-technology-deep-dives/07-iceberg.md).
+
+Related breakdowns: [Log Aggregation](../05-breakdowns-core/01-log-aggregation.md), [Surge Pricing](../05-breakdowns-core/10-surge-pricing.md).

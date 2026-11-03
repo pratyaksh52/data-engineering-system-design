@@ -202,3 +202,4 @@ That is as far as you go in the round. How to choose what to alert on, threshold
 - [Data Contracts](../02-core-concepts/07-data-contracts.md): enforcing quality at the source instead of discovering it downstream.
 - [Top 15 Mistakes](10-top-15-mistakes.md): the most common ways candidates lose points across all seven steps.
 - [Deep Dives](08-deep-dives.md): where the reconciliation and failure-handling checks come from.
+- Related breakdowns: [Data Quality Monitoring Platform](../05-breakdowns-core/09-data-quality-monitoring.md) and [Real-Time Operations Dashboard](../05-breakdowns-core/04-real-time-dashboard.md), for monitoring and SLA sections in full.

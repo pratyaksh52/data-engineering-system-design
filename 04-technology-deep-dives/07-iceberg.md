@@ -187,7 +187,7 @@ Managed catalogs increasingly run these for you; self-managed Iceberg does not, 
 
 ### Catalogs and the REST catalog
 
-Because the catalog holds the commit pointer, it is the table's single point of coordination, and choosing one is a real design decision. Options you will hear named: a **Hive metastore** (older, common in existing Hadoop-style estates), a cloud catalog such as AWS Glue, a **JDBC** catalog (a plain relational database; fine for small setups), **Nessie** (adds Git-like branching), and a **REST catalog**.
+Because the catalog holds the commit pointer, it is the table's single point of coordination, and choosing one is a real design decision. Options you will hear named: a **Hive metastore** (older, common in existing Hadoop-style estates), a managed cloud catalog (AWS Glue Data Catalog, the BigLake metastore on Google Cloud, or Unity Catalog on Azure Databricks), a **JDBC** catalog (a plain relational database; fine for small setups), **Nessie** (adds Git-like branching), and a **REST catalog**.
 
 The **REST catalog** is an open HTTP API specification that any catalog can implement. Instead of each engine embedding catalog-specific client code, every engine speaks the same REST protocol to whichever catalog sits behind it. By 2026 it is the default direction of the ecosystem, and several open-source and vendor catalogs implement it (Apache Polaris, Unity Catalog, Lakekeeper and Gravitino among them; cloud providers also expose REST endpoints; compatibility and feature depth vary, so check). What the REST design buys you:
 

@@ -98,7 +98,7 @@ These assume a typical 1 KB message and a replication factor of 3 (every partiti
 | One partition, planned write rate | ~10 MB/s | 50+ MB/s is possible with large batches; plan on 10. |
 | One partition, one consumer | ~20 to 50 MB/s | Usually limited by the consumer's own processing. |
 | One broker, ingress | 100 to 300 MB/s | Usually network- or disk-bound. |
-| Typical small production cluster | 3 to 6 brokers, a few hundred MB/s in | A million 1 KB messages/sec is ~1 GB/s: still only about 6 to 12 brokers. |
+| Typical small production cluster | 3 to 6 brokers, a few hundred MB/s in | A million 1 KB messages/sec is ~1 GB/s: still only about 10 to 30 brokers once RF 3 triples the traffic. |
 | Partitions per broker | ~2,000 to 4,000 comfortable | KRaft (Kafka's built-in metadata layer, the only mode since Kafka 4.0) raises cluster-wide limits; each partition still costs memory, files and recovery time. |
 | Default max message size | ~1 MB | Put large payloads in object storage and send a pointer. |
 | Compression on JSON (lz4, zstd codecs) | ~3x with lz4, 4 to 6x with zstd, on the wire and on disk | Batches compress better than single messages. |
@@ -230,3 +230,5 @@ If the interviewer corrects a number ("our events are closer to 5 KB"), redo the
 - End every estimate with a **design implication**, and say that your numbers are rules of thumb.
 
 Related lessons: [Partitioning](01-partitioning.md), [Cost Optimization](05-cost-optimization.md), [Sources and Volume](../01-the-framework/04-sources-and-volume.md), [Kafka](../04-technology-deep-dives/02-kafka.md), [Spark Internals](../04-technology-deep-dives/01-spark-internals.md).
+
+Related breakdowns: [Log Aggregation](../05-breakdowns-core/01-log-aggregation.md), [Click Analytics for a URL Shortener](../05-breakdowns-core/02-url-shortener-analytics.md).

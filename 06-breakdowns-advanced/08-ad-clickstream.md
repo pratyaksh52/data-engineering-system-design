@@ -402,7 +402,7 @@ The advertiser receives a credit and a new charge for the same day, weeks later,
 
 After settlement, a day's charges can only go down. The campaign gets its $40 credit, the $18 stays unbilled, and the ledger records what happened and when. It never surprises a customer with a higher bill, and it costs little: if IVT credits are 1–2% of spend and a third of campaigns hit their cap, the forgone re-billing is well under 1% of revenue.
 
-Two follow-ons: flagged clicks are marked `invalid`, so the next attribution run drops the bot farm's "sales" too; and an advertiser whose credits exceed, say, 5% of last month's spend gets a call before the invoice.
+Two follow-ons. First, flagged clicks are marked `invalid`, and a small re-attribution job rewrites only the order lines whose credited `impression_id` is now `invalid`, so the bot farm's "sales" leave past days too. The nightly run reads only newly arrived orders and would never revisit them. Second, an advertiser whose credits exceed, say, 5% of last month's spend gets a call before the invoice.
 
 ### 4. "An advertiser says the dashboard showed $41,300 of spend on Tuesday, but the invoice line says $40,120. Which is right?"
 

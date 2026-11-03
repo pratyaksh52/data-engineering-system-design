@@ -196,3 +196,4 @@ Event sourcing is an application architecture decision. A data engineer's job in
 - Command query responsibility segregation (CQRS) in more depth, including when to use it without event sourcing
 - Sagas: coordinating a business process across several event-sourced services
 - Applying the pattern's ideas to analytics: [Kappa Architecture](02-kappa-architecture.md) and [Backfill and Reprocessing](../02-core-concepts/03-backfill-and-reprocessing.md)
+- Related breakdowns: [Ad Impression and Click Pipeline](../06-breakdowns-advanced/08-ad-clickstream.md), [Real-Time Payment Fraud Detection](../06-breakdowns-advanced/03-fraud-detection.md)

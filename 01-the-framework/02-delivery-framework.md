@@ -96,11 +96,11 @@ Here is the whole framework applied to Marcus's prompt, at outline depth. Notice
 
 **2. Sources & volume (~4 min).** Two sources: the app's event stream (order placed, courier assigned, delivered) and the orders database. Say 2 million orders a day, about 10 events per order, 500 bytes each. That is 20 million events a day, roughly 230 a second on average, maybe 1,500 a second at the dinner peak, and about 10 GB a day. The conclusion that matters: this is small. You do not need a big cluster, and you can say so.
 
-**3. High-level architecture (~12 min).** Events go into a message queue, land as raw files in object storage, get cleaned and joined to order data (which arrives from the orders database through CDC, change data capture: reading its change log instead of querying its tables), and are aggregated into a table the dashboard reads. You build it one requirement at a time: first the 5-minute freshness path, then the month-over-month history.
+**3. High-level architecture (~12 min).** Events go into a message log, land as raw files in object storage, get cleaned and joined to order data (which arrives from the orders database through CDC, change data capture: reading its change log instead of querying its tables), and are aggregated into a table the dashboard reads. You build it one requirement at a time: first the 5-minute freshness path, then the month-over-month history.
 
 ```mermaid
 flowchart LR
-    A["App events"] --> B["Message queue"]
+    A["App events"] --> B["Message log"]
     O["Orders database"] --> C["CDC / nightly extract"]
     B --> D["Raw layer (object storage)"]
     C --> D
@@ -113,7 +113,7 @@ flowchart LR
 
 **5. Pipeline design (~6 min).** At 230 events a second a micro-batch job (a small batch run every minute or two) is enough; full streaming is unnecessary cost. A job that runs every 5 minutes would already miss a 5-minute freshness target, so the run interval has to be shorter than the target. Each run recomputes the current and recent 5-minute windows and overwrites them, so a rerun gives the same rows (idempotent). Late-arriving events are picked up because every run also recomputes the last hour of windows. A failed run retries automatically and alerts after three failures.
 
-**6. Deep dives (~12 min).** The interviewer picks "what happens when an order is corrected three days later?" You discuss how corrections flow in from the orders database and trigger recomputation of affected windows, and what that costs. You raise a second one yourself: skew (one key getting far more data than the rest, so one worker is overloaded), because one city produces a third of the orders.
+**6. Deep dives (~12 min).** The interviewer picks "what happens when an order is corrected three days later?" You discuss how corrections flow in from the orders database and trigger recomputation of affected windows, and what that costs. You raise a second one yourself: duplicates after a replay, meaning the same events arriving twice because the app retried a send or a failed run was rerun. Step 4 deduplicates by event ID, so you can show that a rerun still gives the same counts.
 
 **7. Monitoring & SLAs (~4 min).** Freshness: the serving table was last refreshed under 5 minutes ago. Completeness: event count per city is within 5% of the same hour last week. Alert if either is breached for two consecutive runs.
 

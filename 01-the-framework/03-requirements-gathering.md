@@ -199,3 +199,4 @@ How to do it well:
 - [High-Level Architecture](05-high-level-architecture.md): turning requirements into boxes, one requirement at a time.
 - [Monitoring and SLAs](09-monitoring-and-slas.md): the NFRs from this lesson become the SLAs you monitor.
 - [Late-Arriving Data](../02-core-concepts/08-late-arriving-data.md): why completeness and freshness pull against each other.
+- Related breakdowns: [Real-Time Operations Dashboard](../05-breakdowns-core/04-real-time-dashboard.md) and [E-Commerce Analytics Warehouse](../05-breakdowns-core/03-e-commerce-warehouse.md), both with a worked below-the-line list.

@@ -181,3 +181,4 @@ They are not rivals. A mesh needs a catalog and automated lineage so products ca
 - [Data Lineage](../02-core-concepts/04-data-lineage.md): the metadata catalog and lineage capture a fabric depends on.
 - [Data Contracts](../02-core-concepts/07-data-contracts.md): how to make data trustworthy at the boundary, which metadata alone does not do.
 - [Medallion Architecture](03-medallion-architecture.md): where heavy joins belong once you materialise them.
+- Related breakdowns: [Data Mesh Platform](../06-breakdowns-advanced/09-data-mesh-platform.md), [Company-Wide Medallion Data Lake](../05-breakdowns-core/06-medallion-data-lake.md).

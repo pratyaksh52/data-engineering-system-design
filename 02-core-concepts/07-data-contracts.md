@@ -68,7 +68,7 @@ Which direction needs to be safe, and for how many past versions, is exactly wha
 
 ### The compatibility modes
 
-A **schema registry** (Confluent Schema Registry, AWS Glue Schema Registry and Apicurio are common ones) is a service that stores every version of every schema, usually one per Kafka topic or "subject". When a producer tries to register a new version, the registry compares it with earlier versions and rejects it if it violates the **compatibility mode** configured for that subject.
+A **schema registry** (Confluent Schema Registry, Apicurio, and the cloud-provided ones such as AWS Glue Schema Registry or Azure Schema Registry are common) is a service that stores every version of every schema, usually one per Kafka topic or "subject". When a producer tries to register a new version, the registry compares it with earlier versions and rejects it if it violates the **compatibility mode** configured for that subject.
 
 The names confuse everyone, so anchor them on one question: *who can read whose data?*
 
@@ -194,7 +194,7 @@ This is also the bridge to [data mesh](../03-architecture-patterns/06-data-mesh.
 
 - "The registry checks structure; the contract has to cover meaning."
 - "I'd start with BACKWARD, and go transitive if consumers replay from the beginning of the topic."
-- "Expand, migrate, contract. We never rename in place."
+- "Expand and contract. We never rename in place."
 
 > [!TIP]
 > If you only have 30 seconds: "A contract is the producer's versioned promise about schema, meaning and freshness. It is checked in their CI and at the registry, validated again at ingestion, and breaking changes ship as add-then-remove with a deprecation window."
@@ -223,7 +223,7 @@ This is also the bridge to [data mesh](../03-architecture-patterns/06-data-mesh.
 - A data contract is a producer-owned, versioned agreement covering schema, meaning, quality and delivery. The schema alone is not enough, because the worst breaks (a changed unit) keep the schema identical.
 - Compatibility modes answer "who can read whose data": BACKWARD (new reader, old data; consumers upgrade first), FORWARD (old reader, new data; producers first), FULL (both). Transitive variants check against every earlier version, which you need for replay and long-lived tables.
 - Enforce at several points, as far upstream as possible: producer CI, schema registry, ingestion validation with a dead-letter queue, then table-level checks. Monitoring is the fallback.
-- Ship breaking changes as expand, migrate, contract, using lineage to find consumers and a deprecation window to give them time.
+- Ship breaking changes as expand and contract, using lineage to find consumers and a deprecation window to give them time.
 - Put contracts on team boundaries, owned by the producer, not on every internal table.
 
 ## Where to Go Next

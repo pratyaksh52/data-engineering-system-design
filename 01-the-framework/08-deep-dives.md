@@ -190,3 +190,4 @@ All three are good answers for their level. Do not try to answer at a level abov
 - [Deduplication at Scale](../02-core-concepts/09-deduplication-at-scale.md): the correctness suspect in depth.
 - [Partitioning](../02-core-concepts/01-partitioning.md): skew and keys, for the scale suspect.
 - [Cost Optimization](../02-core-concepts/05-cost-optimization.md): the cost suspect in depth.
+- Related breakdowns: [CDC Replication](../05-breakdowns-core/05-cdc-replication.md) and [Real-Time Payment Fraud Detection](../06-breakdowns-advanced/03-fraud-detection.md), for deep dives worked at several levels.

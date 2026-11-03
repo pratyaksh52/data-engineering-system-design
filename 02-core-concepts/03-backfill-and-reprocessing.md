@@ -212,3 +212,5 @@ Two more isolation points:
 - Input comes from, in order of preference: the raw layer, the message log (if retention allows), the source (if it still has the data and can take the load).
 - Estimate before promising: volume, core-hours, parallelism cap, and the limits on shared clusters and source APIs matter more than the dollar figure.
 - Protect readers with a shadow table, validation and a single switch; rerun dependents in order; tell consumers what changed.
+
+Related breakdowns: [Music Streaming Analytics](../06-breakdowns-advanced/01-music-streaming-analytics.md), [E-Commerce Analytics Warehouse](../05-breakdowns-core/03-e-commerce-warehouse.md).

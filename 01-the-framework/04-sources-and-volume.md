@@ -196,3 +196,4 @@ Here: the serving tables are small. Orders by delivery slot is about 300,000 row
 - [Ingestion Patterns](../02-core-concepts/02-ingestion-patterns.md): how each source type is read in practice.
 - [CDC Patterns](../03-architecture-patterns/04-cdc-patterns.md): reading a database's change log.
 - [Backfill and Reprocessing](../02-core-concepts/03-backfill-and-reprocessing.md): loading history safely.
+- Related breakdowns: [Log Aggregation](../05-breakdowns-core/01-log-aggregation.md) and [Click Analytics for a URL Shortener](../05-breakdowns-core/02-url-shortener-analytics.md), two sources-and-volume sections with full arithmetic.

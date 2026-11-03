@@ -188,3 +188,4 @@ You cannot hold 15 rules in your head under pressure, so do not try. Use the lis
 - [Deep Dives](08-deep-dives.md): where the strongest candidates separate themselves.
 - [Key DE Numbers](../02-core-concepts/10-key-de-numbers.md): the thresholds that make volume estimates quick.
 - [Module 1 quiz](11-quiz.md): test whether you can spot these mistakes in a sample answer.
+- Related breakdowns: [Log Aggregation](../05-breakdowns-core/01-log-aggregation.md) and [Ad Impression and Click Pipeline](../06-breakdowns-advanced/08-ad-clickstream.md), for how the mistakes are avoided in a full answer.

@@ -241,3 +241,4 @@ After a serious incident, hold a short **blameless postmortem**: what happened, 
 - [Data Contracts](07-data-contracts.md): stopping bad data at the producer.
 - [Backfill and Reprocessing](03-backfill-and-reprocessing.md): the safe way to fix data after an alert.
 - [Deduplication at Scale](09-deduplication-at-scale.md): what to do when the volume check shows double.
+- Related breakdowns: [Data Quality Monitoring Platform](../05-breakdowns-core/09-data-quality-monitoring.md), [Real-Time Operations Dashboard](../05-breakdowns-core/04-real-time-dashboard.md).

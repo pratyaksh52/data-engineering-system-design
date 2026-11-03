@@ -188,3 +188,5 @@ What to say aloud:
 - Every saving has a price (replay window, retrieval speed, staleness). Say what it is.
 
 Related lessons: [Key DE Numbers](10-key-de-numbers.md), [Partitioning](01-partitioning.md), [Ingestion Patterns](02-ingestion-patterns.md), [Backfill and Reprocessing](03-backfill-and-reprocessing.md), [Sources and Volume](../01-the-framework/04-sources-and-volume.md), [Apache Iceberg](../04-technology-deep-dives/07-iceberg.md).
+
+Related breakdowns: [Log Aggregation](../05-breakdowns-core/01-log-aggregation.md), [IoT Sensor Pipeline](../06-breakdowns-advanced/10-iot-sensor-pipeline.md).

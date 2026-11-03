@@ -172,3 +172,4 @@ That last one is a senior move. Naming your own weak spot makes you look like so
 - [The Delivery Framework](02-delivery-framework.md): the step-by-step plan with minutes per step.
 - [Requirements Gathering](03-requirements-gathering.md): the first and most underrated step.
 - [Top 15 Mistakes](10-top-15-mistakes.md): a fast checklist to return to before an interview.
+- Related breakdowns: [Log Aggregation](../05-breakdowns-core/01-log-aggregation.md) and [E-Commerce Analytics Warehouse](../05-breakdowns-core/03-e-commerce-warehouse.md), two full answers to see the format end to end.

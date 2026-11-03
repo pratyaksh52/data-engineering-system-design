@@ -200,3 +200,4 @@ Whatever the pattern, finish with the same two checks: **can I run it twice safe
 - [Backfill and Reprocessing](03-backfill-and-reprocessing.md): loading history without duplicates.
 - [Deduplication at Scale](09-deduplication-at-scale.md): cleaning up at-least-once delivery.
 - [Data Contracts](07-data-contracts.md): who owns the schema of what you ingest.
+- Related breakdowns: [Log Aggregation](../05-breakdowns-core/01-log-aggregation.md), [CDC Replication](../05-breakdowns-core/05-cdc-replication.md).

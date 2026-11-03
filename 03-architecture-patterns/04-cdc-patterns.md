@@ -60,7 +60,7 @@ Each log entry becomes a small event. The exact format depends on the tool, but 
 }
 ```
 
-`op` is insert, update or delete. `before` and `after` are the row images (a delete has only `before`). Postgres sends the full old row only if the table is set to `REPLICA IDENTITY FULL`; by default `before` holds just the key. `log_position` is where this change sits in the log, stored as a number so it sorts correctly; it is what you use for ordering and for resuming.
+`op` is insert, update or delete. `before` and `after` are the row images (a delete has only `before`). Postgres sends the full old row only if the table is set to `REPLICA IDENTITY FULL`; by default `before` is empty for updates and holds only the key for deletes. `log_position` is where this change sits in the log (the LSN, converted to a 64-bit integer for comparison so it sorts correctly); it is what you use for ordering and for resuming.
 
 > [!WARNING]
 > **Log-based CDC on Postgres has an operational cost.** The connector reads through a **replication slot**, a bookmark that tells the database "keep log files from this point until the reader confirms it has them." If the connector stops, the slot stays, the database keeps every log file since then, and the primary's disk fills. A dead CDC connector can take down the source database. Alert on slot lag in bytes, and say so in the interview. Postgres 13 and later can cap this with `max_slot_wal_keep_size`: past the cap the database drops the slot to protect itself, and you re-snapshot. MySQL has no slot; it simply deletes old binlog files on a retention schedule, so a long outage there means a re-snapshot too.
@@ -124,7 +124,7 @@ The app team adds a column. Then renames one. Then changes `total` from integer 
 - **Renaming or dropping a column** looks like a drop plus an add, so consumers reading the old name break.
 - **Changing a type** can break serialisation or silently truncate in the target.
 
-The defence is the one from [Data Contracts](../02-core-concepts/07-data-contracts.md): put a schema registry between producer and consumers with a compatibility rule, so a breaking change fails loudly at the source instead of silently downstream. Also keep raw change events untouched in the bronze layer (see [Medallion Architecture](03-medallion-architecture.md)) so you can reprocess after a fix, and agree with the app team that renames and type changes use expand-and-migrate: add the new column, write both, move readers, drop the old.
+The defence is the one from [Data Contracts](../02-core-concepts/07-data-contracts.md): put a schema registry between producer and consumers with a compatibility rule, so a breaking change fails loudly at the source instead of silently downstream. Also keep raw change events untouched in the bronze layer (see [Medallion Architecture](03-medallion-architecture.md)) so you can reprocess after a fix, and agree with the app team that renames and type changes use expand-and-contract: add the new column, write both, move readers, drop the old.
 
 ### Transactions
 
@@ -219,7 +219,7 @@ Do not use CDC because it sounds modern. It adds a connector, a log retention co
 - "The connector was down for two days. What happens?" If the log was retained, it resumes from its saved position and catches up. If the slot was dropped or the log recycled, you re-snapshot into the same tables with upserts and then resume.
 - "Why not just use triggers?" They lengthen every source transaction and need per-table upkeep.
 - "How do you know the target matches the source?" Compare row counts and a checksum per key range on a schedule, and alert on drift.
-- "How do you ship a change to a column type safely?" Expand and migrate: add the new column, write both, move readers, drop the old one, behind a compatibility rule.
+- "How do you ship a change to a column type safely?" Expand and contract: add the new column, write both, move readers, drop the old one, behind a compatibility rule.
 
 ## Common Mistakes
 
@@ -233,7 +233,7 @@ Do not use CDC because it sounds modern. It adds a connector, a log retention co
 
 - **CDC** reads the database's change log instead of querying tables. Log-based is the default: it sees deletes and every intermediate state, in order, with little load. Query-based misses deletes; trigger-based taxes every write.
 - A new pipeline needs a **snapshot plus stream**: record the log position, snapshot as of it, then stream from it. Upserts by key make the overlap harmless.
-- The four traps are ordering (partition by primary key, compare log positions), deletes (soft delete, tombstones), schema change (registry and compatibility rules, expand-and-migrate), and transactions (eventual consistency across tables).
+- The four traps are ordering (partition by primary key, compare log positions), deletes (soft delete, tombstones), schema change (registry and compatibility rules, expand-and-contract), and transactions (eventual consistency across tables).
 - Land raw changes in a change table, then MERGE into a current-state table. Monitor replication slot lag and end-to-end freshness.
 - The **outbox pattern** solves the dual write: write the row and the event in one transaction, let CDC publish the event. It gives consumers deliberate events, not raw table changes.
 
@@ -242,3 +242,4 @@ Do not use CDC because it sounds modern. It adds a connector, a log retention co
 - Tool internals and managed CDC services: [Debezium and CDC Tools](../04-technology-deep-dives/09-debezium-and-cdc-tools.md)
 - Events as the source of truth: [Event Sourcing](05-event-sourcing.md)
 - Keeping the landed tables correct: [Deduplication at Scale](../02-core-concepts/09-deduplication-at-scale.md), [Late-Arriving Data](../02-core-concepts/08-late-arriving-data.md)
+- Related breakdowns: [CDC Replication](../05-breakdowns-core/05-cdc-replication.md), [E-Commerce Analytics Warehouse](../05-breakdowns-core/03-e-commerce-warehouse.md)
