@@ -235,7 +235,7 @@ sequenceDiagram
 What lines up with the framework:
 
 - **The verdict maps to the framework's failure classes.** `fail` (any blocking check failed) becomes `bad_data`: no retry, since it would fail the same way, publish held, owner alerted. `warn` publishes. If the executor itself errors (a check query times out), the verdict is `error`, which the framework treats as `platform`, not `bad_data`: it is the platform's problem, not the team's.
-- **`quality_status` on `PARTITION_STATUS`** is how downstream pipelines learn about it. Their wait-for-inputs step requires `quality_status` of `pass` or `warn` by default, so a held partition holds everything downstream without each team adding a sensor.
+- **`quality_status` on `PARTITION_STATUS`** is how downstream pipelines learn about it. Their wait-for-inputs step requires `quality_status` of `pass` or `warn` by default (tier 2 and 3 inputs also accept `unchecked`; see deep dive 3), so a held partition holds everything downstream without each team adding a sensor.
 - **One alert, not two.** The framework passes its `run_id`; the platform's alert router sends the single `bad_data` alert and attaches the run, so the owner doesn't get one page from the framework and another from the platform.
 
 Iceberg can do the same staging inside one table (write to a branch, or to a staged snapshot tagged with `spark.wap.id`, audit it, then fast-forward or cherry-pick it into the main branch; branch support depends on your Iceberg version and engine). That helps for tables written outside the framework by jobs you control.
@@ -423,7 +423,7 @@ Separate the parts that must be up for a pipeline to publish from the parts that
 | Tier | If the gate can't answer in 5 minutes | Why |
 |---|---|---|
 | 1 (finance, external) | Fail closed: hold, page the platform team | Wrong is worse than late; the platform team owns fixing it |
-| 2 and 3 | Fail open: publish with `quality_status = unchecked`, re-evaluate on recovery | Late is worse than unchecked; consumers can see the flag |
+| 2 and 3 | Fail open: publish with `quality_status = unchecked`, re-evaluate on recovery | Late is worse than unchecked; downstream wait-for-inputs accepts `unchecked` for these tiers, and consumers can see the flag |
 
 - **Re-evaluate after recovery.** Unchecked partitions are evaluated as soon as the executor returns; any that fail open an incident like a post-publish failure.
 

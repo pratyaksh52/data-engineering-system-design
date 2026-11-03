@@ -295,7 +295,7 @@ erDiagram
 ```
 
 - **`plays`**: grain is one play. Partitioned by `play_date` (the UTC date of `play_ts`), with a bloom filter on `play_id` in each file so dedup lookups skip files that cannot contain the key. About 250 GB a day.
-- **`royalty_ledger`**: grain is one posting. The unique key is `(play_id, reason)`, where `reason` is `stream`, `fraud_reversal` or `rule_correction`. `quantity` is +1 or -1. Partitioned by `posting_period` and sorted by ISRC, so a statement reads one partition in order. About 3 TB a month.
+- **`royalty_ledger`**: grain is one posting. The unique key is `(play_id, reason)`, where `reason` is `stream`, `fraud_reversal` or `rule_correction`. `quantity` is +1 or -1. Partitioned by `posting_period` and sorted by ISRC, so a statement reads one partition in order. About 7 TB a month: roughly 150 billion postings at about 50 bytes each, the same as a `plays` row.
 - **`statement_lines`**: grain is one ISRC, territory, tier and period. It splits the total into this month's streams, late plays from earlier months, and reversals, so a rights holder can see why a number moved.
 
 `listener_key` is a pseudonymous ID, not the account ID. Seven years of financial records outlive many accounts, and deleting an account's mapping breaks the link to a person while the counts stay intact (**pseudonymization**; confirm with legal, as in [Medallion Data Lake](../05-breakdowns-core/06-medallion-data-lake.md)).

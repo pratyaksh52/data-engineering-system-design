@@ -321,7 +321,7 @@ Answer with a **freshness budget**: the end-to-end delay split into each hop's s
 | OLAP ingestion until queryable | 1 to 5 s | Pinot and Druid serve rows as consumed; ClickHouse insert batch interval |
 | Wall refresh in the dashboard API | 0 to 5 s | The 5-second refresh cycle |
 | Push to the browser | Under 1 s | An open connection |
-| **Total** | **About 3 to 10 s** | |
+| **Total** | **About 3 to 10 s typical** | The hops sum to about 1 to 12 s; the extremes rarely line up |
 
 **The hidden latency floor.** If the stream job wrote to Kafka with exactly-once transactions, its output would become visible to consumers that read only committed data (`read_committed`, which the OLAP store would need) only when a checkpoint completes. With 30-second checkpoints, every event would wait up to 30 seconds, tripling the budget ([Flink](../04-technology-deep-dives/08-flink.md) explains why). So this design uses an at-least-once sink plus dedup in the store: exactly-once output costs a checkpoint interval of latency, and an ops dashboard would rather show a duplicate for a few seconds than show nothing for 30.
 

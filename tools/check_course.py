@@ -148,7 +148,7 @@ def check_links(p, rel, parsed, root, allow_planned, report):
                 continue
             if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", target):
                 continue
-            path_part = re.split(r"[#?]", target, 1)[0]
+            path_part = re.split(r"[#?]", target, maxsplit=1)[0]
             if not path_part:
                 continue
             dest = (root / path_part.lstrip("/")) if path_part.startswith("/") else (p.parent / path_part)

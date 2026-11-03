@@ -460,5 +460,5 @@ You treat the feed as a platform that several teams change every week. You set r
 - Concepts: [Backfill and Reprocessing](../02-core-concepts/03-backfill-and-reprocessing.md), [Key DE Numbers](../02-core-concepts/10-key-de-numbers.md), [Data Contracts](../02-core-concepts/07-data-contracts.md), [Monitoring and Alerting](../02-core-concepts/06-monitoring-and-alerting.md)
 - Patterns: [CDC Patterns](../03-architecture-patterns/04-cdc-patterns.md), [Kappa Architecture](../03-architecture-patterns/02-kappa-architecture.md)
 - Technology: [Flink](../04-technology-deep-dives/08-flink.md), [Spark Internals](../04-technology-deep-dives/01-spark-internals.md), [Airflow](../04-technology-deep-dives/03-airflow.md)
-- Breakdowns: [Social Media Analytics](04-social-media-analytics.md) (counters and hot posts), [Recommendation Engine](06-recommendation-engine.md) (request-time feature serving), [Video Recommendations](02-video-recommendations.md) (training data from impressions), [Feature Store](../05-breakdowns-core/08-feature-store.md)
-- Next breakdown: [Ad Clickstream](08-ad-clickstream.md)
+- Related breakdowns: [Social Media Analytics](04-social-media-analytics.md) (counters and hot posts), [Recommendation Engine](06-recommendation-engine.md) (request-time feature serving), [Video Recommendations](02-video-recommendations.md) (training data from impressions), [Feature Store](../05-breakdowns-core/08-feature-store.md)
+- Previous breakdown: [Recommendation Engine](06-recommendation-engine.md). Next: [Ad Clickstream](08-ad-clickstream.md)

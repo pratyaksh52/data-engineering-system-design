@@ -174,7 +174,7 @@ Storage is the cheap line; **requests, scans, egress and always-on compute** are
 
 **5. Kafka.** "At about 10 MB/s per partition, 35 MB/s needs at least 4 partitions. I'd take 12 for consumer parallelism and headroom. That's three or four brokers; ingest isn't the hard part here." For retention: 1 TB a day raw, about 330 GB after lz4 compression, kept 3 days, times replication factor 3 is **about 3 TB of broker disk**.
 
-**6. Daily volume and storage.** "1 TB a day of raw JSON. Landed as Parquet at about 5x smaller, that's 200 GB a day, or about 73 TB a year. At roughly $23 per TB-month, year-one storage ends near $1,700 a month. I'd keep raw for 30 days, curated for 2 years, and compact files to 256 MB or more."
+**6. Daily volume and storage.** "1 TB a day of raw JSON. Landed as Parquet at about 5x smaller, that's 200 GB a day, or about 73 TB a year. At roughly $23 per TB-month, year-one storage ends near $1,700 a month. I'd keep raw JSON for 30 days, which holds about 30 TB and adds roughly $700 a month, keep curated data for 2 years, and compact files to 256 MB or more."
 
 **7. Batch compute.** "A nightly job reads 1 TB of raw JSON. At 20 MB/s per core, that's 1,000,000 MB / 20 = 50,000 core-seconds, about 14 core-hours. On 100 cores, around 8 minutes plus startup. At 128 MB per task that's about 8,000 tasks, or 80 waves (rounds of 100 tasks at once) on 100 cores. So even a 15-minute batch is comfortable; volume doesn't force streaming, freshness would."
 

@@ -294,8 +294,10 @@ Partition by `available_ts`, the column the point-in-time join filters on, and s
 
 | Key | Value |
 |---|---|
-| `user_order_stats_v3:user:88123` | `{user_orders_7d: 5, user_avg_basket_30d: 41.2, feature_ts: 2026-11-01T00:00Z}` |
-| `card_velocity_v1:user:88123` | `{user_card_attempts_10m: 2, feature_ts: 2026-11-02T14:03:20Z}` |
+| `user_order_stats_v3:user:88123` | `{user_orders_7d: 5, user_avg_basket_30d: 41.2, feature_ts: 2026-11-01T00:00Z, available_ts: 2026-11-01T03:10Z}` |
+| `card_velocity_v1:user:88123` | `{user_card_attempts_10m: 2, feature_ts: 2026-11-02T14:03:20Z, available_ts: 2026-11-02T14:03:22Z}` |
+
+`feature_ts` decides write-if-newer; `available_ts` (when the value was written) is what the serving API measures the TTL from, the same timestamp the training join uses.
 
 All features of a view sit in one value, so a request reads one key per entity per view, not one per feature: 20 reads instead of hundreds. Values are a compact binary encoding, not JSON, to keep the 2 KB per user. Each key gets a store-level expiry a little longer than the view's TTL, so entities that went inactive (a deleted account) disappear on their own.
 

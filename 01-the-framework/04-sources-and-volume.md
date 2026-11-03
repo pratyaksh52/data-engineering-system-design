@@ -8,9 +8,9 @@ You have just finished requirements for the meal-kit company from [Requirements 
 
 Dana, who has now learned to ask about consumers, answers: "300,000 orders a day, so... a few hundred thousand records. That's small. We can use whatever." She moves on.
 
-The interviewer lets it go, then asks three questions over the next ten minutes. "Where do the orders come from, exactly: the app or the database?" "The ad platform's API only lets you read 100 requests a minute, and finance wants two years of history. How long does the backfill (the one-time load of that history) take?" "Your marketing events land every five minutes. How big are those files?"
+The interviewer lets it go, then asks three questions over the next ten minutes. "Where do the orders come from, exactly: the app or the database?" "The payments provider's API only lets you read 100 requests a minute, and finance wants two years of history. How long does the backfill (the one-time load of that history) take?" "Your marketing events land every five minutes. How big are those files?"
 
-Dana can't answer any of them, because "300,000 orders" was the only number she had. It was the least interesting one. The events the app produces are 200 times more numerous than the orders. The database can't be queried freely without hurting the website. The ad platform's rate limit decides how you load history. None of that shows up unless you first list the sources, and only then do the math.
+Dana can't answer any of them, because "300,000 orders" was the only number she had. It was the least interesting one. The events the app produces are 200 times more numerous than the orders. The database can't be queried freely without hurting the website. The payments API's rate limit decides how you load history. None of that shows up unless you first list the sources, and only then do the math.
 
 Two jobs, then:
 
@@ -48,7 +48,7 @@ Before any arithmetic, ask which decision it would change. For data systems, nea
 | Is a message log (Kafka) needed, and how many partitions? | Peak MB/s into the system | Plan about 10 MB/s per partition, so a few MB/s fits in one. Hundreds of MB/s means a real cluster. |
 | One machine, or a distributed engine? | GB per run, divided by per-core throughput | Tens of GB per run can fit on one machine. Terabytes per run cannot, comfortably. |
 | What does storage cost, and which tier? | Daily volume times retention | Cheap object storage holds tens of TB for hundreds to low thousands of dollars a month. The expensive tier is serving, not the lake. |
-| How big are the files? | Volume per write interval | Under about 128 MB per file you have a [small-files problem](../02-core-concepts/05-cost-optimization.md). |
+| How big are the files? | Volume per write interval | Under about 128 MB per file you have a [small-files problem](../02-core-concepts/01-partitioning.md). |
 | Where are the hot spots? | Share of traffic held by the biggest key | One key with 30% of the traffic overloads one partition no matter the total. See [Partitioning](../02-core-concepts/01-partitioning.md). |
 
 If a number cannot move one of these, skip it. The full conversion tables (events per day to events per second, JSON to Parquet, Kafka and Spark rules) live in [Key DE Numbers](../02-core-concepts/10-key-de-numbers.md). Use them, don't reproduce them from memory.
@@ -105,9 +105,9 @@ The diagram is deliberately only the left edge. The boxes after it come in [High
 
 **Orders database.** 300,000 orders a day, but each order touches several rows: the order, its lines, and a handful of status changes (paid, packed, shipped, delivered). Say 8 row changes per order, 1 KB each: 2.4 million changes and **about 2.4 GB a day**, under 30 changes a second. The existing table is about 200 GB; copying it once, from a replica at 100 MB/s, is roughly 35 minutes. The change rate is trivial, so what you say about this source should be about how to read it, not how big it is.
 
-**Payments.** One record per payment, 1 KB: 300,000 a day, **about 0.3 GB**.
+**Payments.** One record per payment, 1 KB: 300,000 a day, **about 0.3 GB**. The API has a **rate limit**: say 100 requests a minute, each returning up to 100 records.
 
-**Ad platform.** About 2,000 active campaigns, one spend row each per hour: 48,000 rows a day. Negligible in size. The relevant number is the **rate limit**: say 100 requests a minute, each returning up to 100 records.
+**Ad platform.** About 2,000 active campaigns, one spend row each per hour: 48,000 rows a day. Negligible in size.
 
 **Partner file.** One CSV, around 50 MB a night.
 

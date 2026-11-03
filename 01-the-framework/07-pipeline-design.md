@@ -116,7 +116,7 @@ Three rules for scheduling that interviewers like to hear:
 
 - **Trigger on data, not only on time.** "Run at 2 a.m." assumes everything upstream finished by 2 a.m. A task that waits for its inputs (a *sensor*, or an event emitted when upstream finishes) runs when the data is really there. Keep a clock only as the earliest start time.
 - **Give every wait a timeout and an alert.** If the partner's nightly file hasn't arrived by 04:00, the job should not wait forever, nor run with nothing. It should page someone, or publish yesterday's data marked as stale.
-- **Work backwards from the deadline.** If finance needs the table by 07:00 and the job takes 40 minutes after the payments pull, the pull must finish by 06:00 at the latest. That arithmetic belongs in your SLA discussion; see [Monitoring and SLAs](09-monitoring-and-slas.md).
+- **Work backwards from the deadline.** If finance needs the table by 07:00 and the job takes 40 minutes after the payments pull, the pull must finish by 06:20 at the latest, and by about 06:00 if you want 20 minutes of margin for a retry. That arithmetic belongs in your SLA discussion; see [Monitoring and SLAs](09-monitoring-and-slas.md).
 
 Each run should be tied to a **data interval** (the slice of event time it is responsible for, such as "October 31"), not to the wall-clock moment it started. That is what makes the partition overwrite above work, and why a rerun three days later still does the right thing.
 

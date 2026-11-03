@@ -377,7 +377,7 @@ Dialect note: `HASH` is Snowflake's; use `FARM_FINGERPRINT` in BigQuery or `MD5`
 Three choices make it safe ([Pipeline Design](../01-the-framework/07-pipeline-design.md) has the general rules):
 
 - **Rebuild the whole chain per touched key**, ordered by log position, rather than "close the current row, open a new one". An out-of-order or replayed event then produces the same chain, and running the job twice changes nothing.
-- **Deterministic surrogate keys**: a hash of `(customer_id, valid_from)` instead of a sequence. Rebuild the dimension from scratch and every version gets the same key back, so facts that point at it stay correct. A sequence would renumber everything.
+- **Deterministic surrogate keys**: a hash of `(customer_id, valid_from)` instead of a sequence. Rebuild the dimension from scratch and every version gets the same key back, so facts that point at it stay correct. A sequence would renumber everything. Use a wide hash (128 bits, such as MD5) and a uniqueness test on the key: with a 64-bit hash, a collision among tens of millions of versions is unlikely but not impossible, and it would silently merge two customers.
 - **Type 1 columns** (email, name) are updated on every version of that customer, in a separate statement.
 
 ### Loading facts: point-in-time lookups

@@ -39,8 +39,8 @@ flowchart LR
 Follow the bug fix from the example.
 
 1. The team fixes the rule and deploys it as **job v2**, with its own consumer group (or checkpoint), which is how a job tracks its own position in the log, so it does not disturb v1, and its own output table, `trips_per_minute_v2`.
-2. v2 starts from the offset (a message's position in the log) of the earliest event you need to recompute, say 30 days ago. Meanwhile v1 keeps serving the live dashboard.
-3. v2 reads at maximum speed through 30 days of history, then reaches the head of the log and keeps going in real time. This is "catching up".
+2. v2 starts from the offset (a message's position in the log) of the earliest event you need to recompute: 11 days back, where the bug started. Meanwhile v1 keeps serving the live dashboard.
+3. v2 reads at maximum speed through those 11 days of history, then reaches the head of the log and keeps going in real time. This is "catching up".
 4. When v2's output matches expectations for the replayed range (you spot-check against a known day or a payments total), consumers are pointed at v2's table. v1 and its table are shut down and deleted.
 
 There is no cutoff and no merge, because there is only one result. Compared with Lambda you get one codebase, one set of tests, and nothing to reconcile between layers.
@@ -52,7 +52,7 @@ There is no cutoff and no merge, because there is only one result. Compared with
 
 Kappa moves the burden Lambda gave to the batch layer onto the stream job. To replace the batch layer, the stream job must itself be:
 
-- **Event-time based.** Windows are computed from when events happened, using a **watermark** (the engine's estimate of how far event time has progressed), not from when they arrived. Otherwise a replay at 100x speed would put 30 days of events in the same few minutes of processing time. A replay produces the right answer only if the job ignores the clock on the wall.
+- **Event-time based.** Windows are computed from when events happened, using a **watermark** (the engine's estimate of how far event time has progressed), not from when they arrived. Otherwise a replay at 100x speed would put 11 days of events in the same few minutes of processing time. A replay produces the right answer only if the job ignores the clock on the wall.
 - **Idempotent or transactional at the sink.** Replays reread events, so the writes must be safe to repeat (an upsert on a business key, or a partition overwrite). See [Deduplication at Scale](../02-core-concepts/09-deduplication-at-scale.md).
 - **Deterministic.** The same events through the same code give the same result. A job that calls an external API for each event, or reads "current" reference data, gives a different answer on replay than it did live.
 
@@ -79,7 +79,7 @@ For a year of history in object storage the cost is modest: 365 TB of JSON is ab
 
 ### Limit 2: Can you afford to replay?
 
-Replay is reading, not magic. Say you need to recompute the last 30 days: 30 TB of events.
+Replay is reading, not magic. Say finance wants its new "completed trip" definition applied to the last 30 days, and retention has been raised to cover them: 30 TB of events.
 
 - **Read throughput.** The replay competes with live traffic for the same brokers. At 12 partitions and 30 MB/s per partition the maximum is 360 MB/s, so 30,000,000 MB takes 30,000,000 / 360 = about 83,000 seconds, a little over 23 hours. But on a small cluster (3 to 6 brokers handling 100 to 300 MB/s each) that is a large share of total capacity, and the live consumers share those brokers. Throttle the replay (a consumer quota does it) to 100 MB/s and it takes 3.5 days. Plan for that.
 - **Compute.** To get 30 TB through in one day you need about 350 MB/s of processing. At 10 to 50 MB/s per core, that is roughly 7 to 35 cores for a day, plus the live job. That is tens of dollars of compute at the prices in Key DE Numbers, not a catastrophe. A stateful job with big joins is slower and needs more.

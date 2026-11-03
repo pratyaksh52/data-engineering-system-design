@@ -335,7 +335,7 @@ Git is the source of truth for configs; the registry is a queryable copy written
 
 **The runtime shape.** Every generated pipeline has the same skeleton, so any on-call engineer can read any pipeline:
 
-1. **Wait for inputs**: deferrable, on the partition-status table, with a timeout set from the freshness SLA.
+1. **Wait for inputs**: deferrable, on the partition-status table, with a timeout set from the freshness SLA. An input counts as ready when its partition is published with `quality_status` of `pass` or `warn`, so a partition held by a failed check also holds everything downstream.
 2. **Run steps** in order, each submitting work and deferring until it finishes.
 3. **Checks**: rules from the spec plus framework defaults (row count not zero, schema matches contract). A failing check stops the run before publish.
 4. **Publish**: atomic partition overwrite or MERGE, then write `PARTITION_STATUS` and emit `dataset_published`.

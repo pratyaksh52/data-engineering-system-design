@@ -250,7 +250,7 @@ A subscription company has an `account_health` table (40,000 accounts) rebuilt n
 
 Use reverse ETL: read the model, diff against the last synced rows, map columns to CRM fields, write only changed rows in batches, record successes and failures. Upsert by the CRM's own account ID, not an email people can edit. For accounts that leave the model, set an inactive flag instead of deleting history.
 
-Rate limit arithmetic: 100 x 10 = 1,000 records a minute. A nightly delta of about 1,200 records takes about 1.2 minutes; the first full load of 40,000 takes about 40 minutes. The first run is the problem because nothing is in the diff, so use the bulk endpoint for anything bigger and never resend everything each night. Retry 429 and 5xx with backoff, quarantine permanent failures with the reason, and alert on failed-row count.
+Rate limit arithmetic: 100 x 10 = 1,000 records a minute. A nightly delta of about 1,200 records takes about 1.2 minutes; the first full load of 40,000 takes about 40 minutes, which is still fine here. The first run is always the biggest because nothing is in the diff yet, so it is the one that breaks as the table grows: use the bulk endpoint for anything bigger and never resend everything each night. Retry 429 and 5xx with backoff, quarantine permanent failures with the reason, and alert on failed-row count.
 
 The task needs an event, but reverse ETL syncs state. Detect the flip by diffing the new row against the last synced row and create one task. A model that says "all at-risk accounts" creates a new task every night. Make the write idempotent (an idempotency key from `(account_id, flag, changed_at)`), and save sync state after the push, so a crash causes a harmless re-push.
 
