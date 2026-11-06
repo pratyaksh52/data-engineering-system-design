@@ -10,7 +10,7 @@ HERE = Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
 CHECKER = HERE.parent / "check_course.py"
 sys.path.insert(0, str(HERE.parent))
-from check_course import Report, check_nav, lesson_type  # noqa: E402
+from check_course import Report, check_home_cards, check_nav, lesson_type  # noqa: E402
 
 
 def quiz_text(n, details_for=None):
@@ -112,6 +112,34 @@ class CheckerCase(unittest.TestCase):
         self.assertEqual(report.errors, 2)
         self.assertIn("page missing from the sidebar nav: 01-the-framework/02-b.md", out)
         self.assertIn("nav entry points to a missing page: 01-the-framework/09-gone.md", out)
+
+    def home_card_course(self, card_desc="The ideas.", card_count="2 lessons and a quiz", extra=""):
+        self.write("01-the-framework/index.md", "# Module 1: Framework\n\nThe ideas.\n\n## Lessons\n\n"
+                   "1. [A](01-a.md)\n2. [B](02-b.md)\n3. [Quiz](03-quiz.md)\n")
+        self.write("index.md", '# H\n\n<div class="grid cards" markdown="1">\n\n'
+                   f"- **[Module 1: Framework](01-the-framework/index.md)**\n\n    {card_desc}\n\n    {card_count}\n{extra}\n</div>\n")
+        report = Report()
+        check_home_cards(self.root, report)
+        return report
+
+    def test_home_cards_match_module_index(self):
+        report = self.home_card_course()
+        self.assertEqual((report.errors, report.lines), (0, []))
+
+    def test_home_card_drift_reported(self):
+        report = self.home_card_course(card_desc="Old words.", card_count="3 lessons and a quiz")
+        out = "\n".join(report.lines)
+        self.assertEqual(report.errors, 2)
+        self.assertIn("card description 'Old words.'", out)
+        self.assertIn("card lesson count '3 lessons and a quiz'", out)
+
+    def test_home_cards_missing_and_dangling(self):
+        self.write("02-core-concepts/index.md", "# Module 2: Core\n\nMore.\n")
+        report = self.home_card_course(extra="\n- **[Module 9: Gone](06-breakdowns-advanced/index.md)**\n\n    X\n\n    0 lessons and a quiz\n")
+        out = "\n".join(report.lines)
+        self.assertEqual(report.errors, 2)
+        self.assertIn("no home page card for module 02-core-concepts", out)
+        self.assertIn("card points to a missing module: 06-breakdowns-advanced", out)
 
     def test_allow_planned_links(self):
         p = self.write("README.md", "# T\n\n[x](02-core-concepts/03-backfill-and-reprocessing.md)\n")

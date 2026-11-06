@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Course checker: structure, link, forbidden-term and Mermaid checks for the markdown course.
+"""Course checker: structure, link, forbidden-term, site nav, home card and Mermaid checks for the markdown course.
 
 Usage: uv run tools/check_course.py [--mermaid] [--allow-planned] [--root DIR] [PATH ...]
 Exit 0 when there are no errors; otherwise exit 1 with one `path:line: CODE message` line per error.
@@ -207,6 +207,48 @@ def check_nav(config: Path, root: Path, report: Report) -> None:
         report.error(rel, 0, "NAV", f"nav entry points to a missing page: {page}")
 
 
+HOME_CARD_RE = re.compile(r"^- \*\*\[([^\]]+)\]\((0[1-6]-[a-z0-9-]+)/index\.md\)\*\*\s*$")
+LESSON_ITEM_RE = re.compile(r"^\d+\.\s+\[[^\]]*\]\(([^)\s]+)\)")
+
+
+def module_summary(index: Path):
+    """Return (title, description, lesson count without the quiz) from a module index.md."""
+    lines = index.read_text(encoding="utf-8").splitlines()
+    title = lines[0][2:].strip() if lines and lines[0].startswith("# ") else ""
+    desc = next((l.strip() for l in lines[1:] if l.strip() and not l.startswith("#")), "")
+    targets = [m.group(1) for l in lines if (m := LESSON_ITEM_RE.match(l))]
+    return title, desc, sum(1 for t in targets if not t.endswith("quiz.md"))
+
+
+def check_home_cards(root: Path, report: Report) -> None:
+    """Each module has one card on the home page, and its title, description and lesson count match the module index."""
+    home = root / "index.md"
+    rel = display(home, root)
+    try:
+        lines = home.read_text(encoding="utf-8").splitlines()
+    except OSError as e:
+        report.error(rel, 0, "HOME_CARDS", f"cannot read home page: {e}")
+        return
+    cards = {}
+    for i, line in enumerate(lines):
+        if m := HOME_CARD_RE.match(line):
+            body = [l.strip() for l in lines[i + 1:i + 6] if l.strip()][:2]
+            cards[m.group(2)] = (i + 1, m.group(1), body + [""] * (2 - len(body)))
+    modules = sorted(p.parent.name for p in root.glob("0[1-6]-*/index.md"))
+    for mod in modules:
+        if mod not in cards:
+            report.error(rel, 0, "HOME_CARDS", f"no home page card for module {mod}")
+            continue
+        n, title, (desc, count) = cards[mod]
+        want_title, want_desc, lessons = module_summary(root / mod / "index.md")
+        want_count = f"{lessons} lessons and a quiz"
+        for got, want, what in ((title, want_title, "title"), (desc, want_desc, "description"), (count, want_count, "lesson count")):
+            if got != want:
+                report.error(rel, n, "HOME_CARDS", f"{mod} card {what} '{got}' does not match module index '{want}'")
+    for mod in sorted(set(cards) - set(modules)):
+        report.error(rel, cards[mod][0], "HOME_CARDS", f"home page card points to a missing module: {mod}")
+
+
 def check_structure(p, rel, ltype, parsed, text, report):
     headings = [(n, len(m.group(1)), m.group(2)) for n, line, f, _ in parsed
                 if not f and (m := HEADING_RE.match(line))]
@@ -354,6 +396,7 @@ def main(argv=None) -> int:
 
     if not args.root and not args.paths:
         check_nav(SITE_CONFIG, root, report)
+        check_home_cards(root, report)
 
     for line in report.lines:
         print(line)

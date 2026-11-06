@@ -8,7 +8,7 @@ A self-study course for the data engineering system design interview: the 45 to 
 
 | Path | What it holds |
 | --- | --- |
-| `course/` | The course itself: the six modules, their quizzes and the glossary. `course/index.md` is the home page. |
+| `course/` | The course itself: the six modules, their quizzes and the glossary. `course/index.md` is the home page. `course/stylesheets/` and `course/assets/` hold the website's styling and favicon. |
 | `tools/` | `check_course.py`, which checks lesson structure, links and the site sidebar, plus its tests. |
 | `docs/` | Planning notes from when the course was written. Not part of the course. |
 | `zensical.toml` | Config for the website version of the course. |
@@ -50,4 +50,8 @@ Lessons are plain GitHub-flavored markdown, with three conventions so they also 
 - Hidden quiz answers use `<details markdown="1">`. Without `markdown="1"` the site shows the answer's markdown as raw text, and the checker flags it.
 - Diagrams use ```` ```mermaid ```` code blocks.
 
-A new lesson must also be added to the `nav` list in `zensical.toml` and to the module's `index.md`. The checker reports any page missing from the sidebar.
+A new lesson must also be added to the `nav` list in `zensical.toml` and to the module's `index.md`. The checker reports any page missing from the sidebar. If a module's title, one-line description or lesson count changes, update its card on the home page (`course/index.md`) too; the checker reports cards that no longer match.
+
+## Styling the Website
+
+The site's look lives in `course/stylesheets/extra.css`: the teal brand colors, colored callouts, quiz answer boxes and the red, amber and green markers on Bad, Good and Great Solution headings. Site-only styling must never change how a lesson reads on GitHub, so style the HTML Zensical already produces instead of adding site-specific markdown such as content tabs or annotations. The site adds no packages beyond `zensical` and `markdown-callouts`.

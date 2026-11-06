@@ -1,0 +1,176 @@
+/*
+ * Site-only styling for the course website.
+ * Lessons must still read cleanly as plain markdown on GitHub, so nothing here may
+ * depend on markdown syntax GitHub cannot show. Everything keys off the HTML Zensical
+ * already produces: callout classes, plain <details> quiz answers, heading ids.
+ */
+
+/* ---------- Colors ---------- */
+
+[data-md-color-scheme="default"] {
+  --brand: #0f766e;
+  --brand-strong: #115e59;
+  --note: #0969da;
+  --tip: #1a7f37;
+  --warning: #b7791f;
+  --bad: #cf222e;
+  --good: #bf8700;
+  --great: #1a7f37;
+}
+
+[data-md-color-scheme="slate"] {
+  --brand: #2dd4bf;
+  --brand-strong: #5eead4;
+  --note: #58a6ff;
+  --tip: #3fb950;
+  --warning: #d4a72c;
+  --bad: #f85149;
+  --good: #d29922;
+  --great: #3fb950;
+}
+
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: var(--brand);
+  --md-primary-fg-color--light: var(--brand-strong);
+  --md-primary-fg-color--dark: var(--brand-strong);
+  --md-primary-bg-color: var(--md-default-bg-color);
+  --md-primary-bg-color--light: var(--md-default-bg-color--light);
+  --md-typeset-a-color: var(--brand);
+}
+
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color: var(--brand);
+  --md-accent-fg-color--transparent: color-mix(in srgb, var(--brand) 10%, transparent);
+  --md-accent-bg-color: var(--md-default-bg-color);
+  --md-accent-bg-color--light: var(--md-default-bg-color--light);
+}
+
+.md-header__button.md-logo {
+  color: var(--brand);
+}
+
+/* ---------- Callouts: > [!NOTE] / [!TIP] / [!WARNING], in GitHub's colors ---------- */
+
+.md-typeset .admonition.note,
+.md-typeset .admonition.tip,
+.md-typeset .admonition.warning {
+  --callout: var(--note);
+  border-left: 0.2rem solid var(--callout);
+  border-radius: 0.2rem;
+  background-color: color-mix(in srgb, var(--callout) 7%, transparent);
+}
+
+.md-typeset .admonition.tip {
+  --callout: var(--tip);
+}
+
+/* WARNING is the most common callout in the course, so its tint stays light. */
+.md-typeset .admonition.warning {
+  --callout: var(--warning);
+  background-color: color-mix(in srgb, var(--callout) 5%, transparent);
+}
+
+.md-typeset .admonition.note > .admonition-title,
+.md-typeset .admonition.tip > .admonition-title,
+.md-typeset .admonition.warning > .admonition-title {
+  color: var(--callout);
+}
+
+.md-typeset .admonition.note > .admonition-title::before,
+.md-typeset .admonition.tip > .admonition-title::before,
+.md-typeset .admonition.warning > .admonition-title::before {
+  background-color: var(--callout);
+}
+
+/* ---------- Quiz answers: plain <details markdown="1"> blocks ---------- */
+
+.md-typeset details:not([class]) {
+  background-color: color-mix(in srgb, var(--brand) 6%, transparent);
+  border: 0.05rem solid color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+.md-typeset details:not([class]) > summary {
+  color: var(--brand);
+}
+
+.md-typeset details:not([class]) > summary::before {
+  background-color: var(--brand);
+  -webkit-mask-image: var(--md-admonition-icon--success);
+  mask-image: var(--md-admonition-icon--success);
+}
+
+.md-typeset details:not([class]) > summary::after {
+  color: var(--brand);
+}
+
+.md-typeset details:not([class])[open] {
+  padding-bottom: 0.4rem;
+}
+
+/* ---------- Breakdowns: Bad / Good / Great Solution markers ---------- */
+
+.md-typeset h4[id^="bad-solution"]::before,
+.md-typeset h4[id^="good-solution"]::before,
+.md-typeset h4[id^="great-solution"]::before,
+.md-sidebar--secondary a[href*="#bad-solution"]::before,
+.md-sidebar--secondary a[href*="#good-solution"]::before,
+.md-sidebar--secondary a[href*="#great-solution"]::before {
+  content: "";
+  flex-shrink: 0;
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  margin-right: 0.5em;
+  border-radius: 50%;
+  vertical-align: 0.1em;
+  background-color: var(--marker);
+}
+
+.md-sidebar--secondary a[href*="#bad-solution"]::before,
+.md-sidebar--secondary a[href*="#good-solution"]::before,
+.md-sidebar--secondary a[href*="#great-solution"]::before {
+  margin-top: 0.45em;
+}
+
+.md-typeset h4[id^="bad-solution"],
+.md-sidebar--secondary a[href*="#bad-solution"] {
+  --marker: var(--bad);
+}
+
+.md-typeset h4[id^="good-solution"],
+.md-sidebar--secondary a[href*="#good-solution"] {
+  --marker: var(--good);
+}
+
+.md-typeset h4[id^="great-solution"],
+.md-sidebar--secondary a[href*="#great-solution"] {
+  --marker: var(--great);
+}
+
+/* ---------- Tables, dialogue, home cards ---------- */
+
+.md-typeset table:not([class]) {
+  font-size: 0.68rem;
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--md-default-fg-color--lightest);
+}
+
+/* Blockquotes in lessons are mostly interview dialogue. */
+.md-typeset blockquote {
+  border-left-color: color-mix(in srgb, var(--brand) 45%, transparent);
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  border-color: var(--brand);
+}
+
+.md-typeset .grid.cards > ul > li > p:first-child a {
+  text-decoration: none;
+}
+
+.md-typeset .grid.cards > ul > li > p:last-child {
+  color: var(--md-default-fg-color--light);
+  font-size: 0.85em;
+}
