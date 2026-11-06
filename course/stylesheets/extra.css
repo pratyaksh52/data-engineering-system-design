@@ -49,6 +49,14 @@
   color: var(--brand);
 }
 
+/* ---------- Layout ---------- */
+
+/* The theme caps the page at 61rem. 68rem gives tables and diagrams room while
+   keeping prose lines near 100 characters; going much wider hurts readability. */
+.md-grid {
+  max-width: 68rem;
+}
+
 /* ---------- Callouts: > [!NOTE] / [!TIP] / [!WARNING], in GitHub's colors ---------- */
 
 .md-typeset .admonition.note,
