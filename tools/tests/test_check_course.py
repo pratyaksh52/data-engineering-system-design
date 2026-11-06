@@ -10,7 +10,7 @@ HERE = Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
 CHECKER = HERE.parent / "check_course.py"
 sys.path.insert(0, str(HERE.parent))
-from check_course import lesson_type  # noqa: E402
+from check_course import Report, check_nav, lesson_type  # noqa: E402
 
 
 def quiz_text(n, details_for=None):
@@ -19,7 +19,7 @@ def quiz_text(n, details_for=None):
     for i in range(1, n + 1):
         out += [f"### Q{i}.", "", "Question text?", ""]
         if i in details_for:
-            out += ["<details>", "<summary>Answer</summary>", "", "Because.", "", "</details>", ""]
+            out += ['<details markdown="1">', "<summary>Answer</summary>", "", "Because.", "", "</details>", ""]
     return "\n".join(out)
 
 
@@ -93,6 +93,26 @@ class CheckerCase(unittest.TestCase):
         code, out = self.run_check(paths=[p])
         self.assertEqual((code, out), (0, ""))
 
+    def test_details_without_markdown_attribute_rejected(self):
+        p = self.write("a/x.md", '# T\n\n<details>\n<summary>A</summary>\n\nB\n</details>\n\n<details markdown="1">\n</details>\n')
+        code, out = self.run_check(paths=[p])
+        self.assertEqual(code, 1)
+        self.assertIn("a/x.md:3: DETAILS_MARKDOWN", out)
+        self.assertNotIn("a/x.md:9:", out)
+
+    def test_nav_must_match_course_pages(self):
+        self.write("index.md", "# H\n")
+        self.write("01-the-framework/01-a.md", "# A\n")
+        self.write("01-the-framework/02-b.md", "# B\n")
+        cfg = self.write("zensical.toml", '[project]\nnav = [\n  { "Home" = "index.md" },\n'
+                         '  { "M1" = ["01-the-framework/01-a.md", { "Gone" = "01-the-framework/09-gone.md" }] },\n]\n')
+        report = Report()
+        check_nav(cfg, self.root, report)
+        out = "\n".join(report.lines)
+        self.assertEqual(report.errors, 2)
+        self.assertIn("page missing from the sidebar nav: 01-the-framework/02-b.md", out)
+        self.assertIn("nav entry points to a missing page: 01-the-framework/09-gone.md", out)
+
     def test_allow_planned_links(self):
         p = self.write("README.md", "# T\n\n[x](02-core-concepts/03-backfill-and-reprocessing.md)\n")
         code, out = self.run_check("--allow-planned", paths=[p])
@@ -113,6 +133,7 @@ class CheckerCase(unittest.TestCase):
             "06-breakdowns-advanced/01-x.md": "breakdown",
             "05-breakdowns-core/11-quiz.md": "quiz",
             "README.md": None,
+            "01-the-framework/index.md": None,
             "GLOSSARY.md": None,
         }
         for rel, want in cases.items():

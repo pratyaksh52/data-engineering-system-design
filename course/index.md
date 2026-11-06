@@ -47,7 +47,7 @@ The course is written from the interviewer's side of the table: what gets asked,
 
 Reference: [Glossary](GLOSSARY.md)
 
-### [Module 1: The Framework](01-the-framework/)
+### [Module 1: The Framework](01-the-framework/index.md)
 
 The structure of the round and the seven steps you follow in it.
 
@@ -64,7 +64,7 @@ The structure of the round and the seven steps you follow in it.
 11. [Module 1 Quiz: The Framework](01-the-framework/11-quiz.md)
 
 
-### [Module 2: Core Concepts](02-core-concepts/)
+### [Module 2: Core Concepts](02-core-concepts/index.md)
 
 The ideas that come up inside almost every design.
 
@@ -81,7 +81,7 @@ The ideas that come up inside almost every design.
 11. [Module 2 Quiz: Core Concepts](02-core-concepts/11-quiz.md)
 
 
-### [Module 3: Architecture Patterns](03-architecture-patterns/)
+### [Module 3: Architecture Patterns](03-architecture-patterns/index.md)
 
 Named ways to put a data platform together, and when each one fits.
 
@@ -97,7 +97,7 @@ Named ways to put a data platform together, and when each one fits.
 10. [Module 3 Quiz: Architecture Patterns](03-architecture-patterns/10-quiz.md)
 
 
-### [Module 4: Technology Deep Dives](04-technology-deep-dives/)
+### [Module 4: Technology Deep Dives](04-technology-deep-dives/index.md)
 
 How the common tools work, to the depth interviewers probe.
 
@@ -114,7 +114,7 @@ How the common tools work, to the depth interviewers probe.
 11. [Module 4 Quiz: Technology Deep Dives](04-technology-deep-dives/11-quiz.md)
 
 
-### [Module 5: Question Breakdowns, Core](05-breakdowns-core/)
+### [Module 5: Question Breakdowns, Core](05-breakdowns-core/index.md)
 
 Ten full worked designs of classic prompts.
 
@@ -131,7 +131,7 @@ Ten full worked designs of classic prompts.
 11. [Module 5 Quiz: Core Breakdowns](05-breakdowns-core/11-quiz.md)
 
 
-### [Module 6: Question Breakdowns, Advanced](06-breakdowns-advanced/)
+### [Module 6: Question Breakdowns, Advanced](06-breakdowns-advanced/index.md)
 
 Ten harder prompts with more moving parts.
 

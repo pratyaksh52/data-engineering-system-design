@@ -1,0 +1,150 @@
+# Zensical site config. Preview with `uv run zensical serve`; build with `uv run zensical build`.
+# The sidebar below must list every page in course/; `uv run tools/check_course.py` enforces this.
+
+[project]
+site_name = "Data Engineering System Design"
+site_description = "A self-study course for the data engineering system design interview."
+docs_dir = "course"
+site_dir = "site"
+nav = [
+  { "Home" = "index.md" },
+  { "Module 1: The Framework" = [
+    "01-the-framework/index.md",
+    { "How Data Engineering Design Interviews Work" = "01-the-framework/01-how-interviews-work.md" },
+    { "The Delivery Framework" = "01-the-framework/02-delivery-framework.md" },
+    { "Requirements Gathering" = "01-the-framework/03-requirements-gathering.md" },
+    { "Sources and Volume" = "01-the-framework/04-sources-and-volume.md" },
+    { "High-Level Architecture" = "01-the-framework/05-high-level-architecture.md" },
+    { "Data Model Design" = "01-the-framework/06-data-model-design.md" },
+    { "Pipeline Design" = "01-the-framework/07-pipeline-design.md" },
+    { "Deep Dives" = "01-the-framework/08-deep-dives.md" },
+    { "Monitoring and SLAs" = "01-the-framework/09-monitoring-and-slas.md" },
+    { "Top 15 Mistakes" = "01-the-framework/10-top-15-mistakes.md" },
+    { "Module 1 Quiz: The Framework" = "01-the-framework/11-quiz.md" },
+  ] },
+  { "Module 2: Core Concepts" = [
+    "02-core-concepts/index.md",
+    { "Partitioning" = "02-core-concepts/01-partitioning.md" },
+    { "Ingestion Patterns" = "02-core-concepts/02-ingestion-patterns.md" },
+    { "Backfill and Reprocessing" = "02-core-concepts/03-backfill-and-reprocessing.md" },
+    { "Data Lineage" = "02-core-concepts/04-data-lineage.md" },
+    { "Cost Optimization" = "02-core-concepts/05-cost-optimization.md" },
+    { "Monitoring and Alerting" = "02-core-concepts/06-monitoring-and-alerting.md" },
+    { "Data Contracts" = "02-core-concepts/07-data-contracts.md" },
+    { "Late-Arriving Data" = "02-core-concepts/08-late-arriving-data.md" },
+    { "Deduplication at Scale" = "02-core-concepts/09-deduplication-at-scale.md" },
+    { "Key DE Numbers" = "02-core-concepts/10-key-de-numbers.md" },
+    { "Module 2 Quiz: Core Concepts" = "02-core-concepts/11-quiz.md" },
+  ] },
+  { "Module 3: Architecture Patterns" = [
+    "03-architecture-patterns/index.md",
+    { "Lambda Architecture" = "03-architecture-patterns/01-lambda-architecture.md" },
+    { "Kappa Architecture" = "03-architecture-patterns/02-kappa-architecture.md" },
+    { "Medallion Architecture" = "03-architecture-patterns/03-medallion-architecture.md" },
+    { "CDC Patterns" = "03-architecture-patterns/04-cdc-patterns.md" },
+    { "Event Sourcing" = "03-architecture-patterns/05-event-sourcing.md" },
+    { "Data Mesh" = "03-architecture-patterns/06-data-mesh.md" },
+    { "Data Fabric" = "03-architecture-patterns/07-data-fabric.md" },
+    { "Micro-Batch vs Streaming" = "03-architecture-patterns/08-micro-batch-vs-streaming.md" },
+    { "Reverse ETL" = "03-architecture-patterns/09-reverse-etl.md" },
+    { "Module 3 Quiz: Architecture Patterns" = "03-architecture-patterns/10-quiz.md" },
+  ] },
+  { "Module 4: Technology Deep Dives" = [
+    "04-technology-deep-dives/index.md",
+    { "Spark Internals" = "04-technology-deep-dives/01-spark-internals.md" },
+    { "Kafka" = "04-technology-deep-dives/02-kafka.md" },
+    { "Airflow" = "04-technology-deep-dives/03-airflow.md" },
+    { "dbt" = "04-technology-deep-dives/04-dbt.md" },
+    { "Snowflake: How a Modern Cloud Warehouse Works" = "04-technology-deep-dives/05-snowflake.md" },
+    { "Delta Lake" = "04-technology-deep-dives/06-delta-lake.md" },
+    { "Apache Iceberg" = "04-technology-deep-dives/07-iceberg.md" },
+    { "Flink" = "04-technology-deep-dives/08-flink.md" },
+    { "Debezium and CDC Tools" = "04-technology-deep-dives/09-debezium-and-cdc-tools.md" },
+    { "Orchestrator Comparison" = "04-technology-deep-dives/10-orchestrator-comparison.md" },
+    { "Module 4 Quiz: Technology Deep Dives" = "04-technology-deep-dives/11-quiz.md" },
+  ] },
+  { "Module 5: Question Breakdowns, Core" = [
+    "05-breakdowns-core/index.md",
+    { "Design a Log Aggregation Platform" = "05-breakdowns-core/01-log-aggregation.md" },
+    { "Design Click Analytics for a URL Shortener" = "05-breakdowns-core/02-url-shortener-analytics.md" },
+    { "Design an E-Commerce Analytics Warehouse" = "05-breakdowns-core/03-e-commerce-warehouse.md" },
+    { "Design a Real-Time Operations Dashboard" = "05-breakdowns-core/04-real-time-dashboard.md" },
+    { "Design CDC Replication from OLTP Databases into the Lake" = "05-breakdowns-core/05-cdc-replication.md" },
+    { "Design a Company-Wide Medallion Data Lake" = "05-breakdowns-core/06-medallion-data-lake.md" },
+    { "Design a Config-Driven ETL Framework" = "05-breakdowns-core/07-etl-framework.md" },
+    { "Design a Feature Store for ML" = "05-breakdowns-core/08-feature-store.md" },
+    { "Design a Data Quality Monitoring Platform" = "05-breakdowns-core/09-data-quality-monitoring.md" },
+    { "Design the Data Pipeline Behind Uber-Style Surge Pricing" = "05-breakdowns-core/10-surge-pricing.md" },
+    { "Module 5 Quiz: Core Breakdowns" = "05-breakdowns-core/11-quiz.md" },
+  ] },
+  { "Module 6: Question Breakdowns, Advanced" = [
+    "06-breakdowns-advanced/index.md",
+    { "Design Spotify-Style Listening Analytics and Royalty Counts" = "06-breakdowns-advanced/01-music-streaming-analytics.md" },
+    { "Design the Data Platform Behind Netflix-Style Video Recommendations" = "06-breakdowns-advanced/02-video-recommendations.md" },
+    { "Design a Real-Time Payment Fraud Detection Pipeline" = "06-breakdowns-advanced/03-fraud-detection.md" },
+    { "Design Twitter/X-Style Engagement Analytics" = "06-breakdowns-advanced/04-social-media-analytics.md" },
+    { "Design a Multi-Tenant Analytics Platform" = "06-breakdowns-advanced/05-multi-tenant-platform.md" },
+    { "Design an E-Commerce Recommendation Engine That Stays Fresh" = "06-breakdowns-advanced/06-recommendation-engine.md" },
+    { "Design the Data Pipeline Behind a LinkedIn-Style Activity Feed" = "06-breakdowns-advanced/07-activity-feed.md" },
+    { "Design an Ad Impression and Click Pipeline for Billing and Attribution" = "06-breakdowns-advanced/08-ad-clickstream.md" },
+    { "Design a Data Mesh Platform" = "06-breakdowns-advanced/09-data-mesh-platform.md" },
+    { "Design an IoT Sensor Data Pipeline" = "06-breakdowns-advanced/10-iot-sensor-pipeline.md" },
+    { "Module 6 Quiz: Advanced Breakdowns" = "06-breakdowns-advanced/11-quiz.md" },
+  ] },
+  { "Glossary" = "GLOSSARY.md" },
+]
+
+[project.theme]
+language = "en"
+features = [
+  "content.code.copy",
+  "content.code.select",
+  "content.footnote.tooltips",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.instant",
+  "navigation.instant.prefetch",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}                          # renders markdown inside <details markdown="1"> quiz answers
+tables = {}
+toc.permalink = true
+"markdown_callouts.github_callouts" = {} # GitHub-style > [!NOTE] / [!TIP] / [!WARNING] boxes
+pymdownx.betterem = {}
+pymdownx.details = {}
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.line_spans = "__span"
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]

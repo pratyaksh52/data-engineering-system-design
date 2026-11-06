@@ -8,7 +8,7 @@ Fifteen questions on the interview round and the seven-step delivery framework. 
 
 The prompt is: "Design a pipeline that powers a daily revenue dashboard for an online marketplace." A candidate spends ten minutes on a REST service that accepts orders, with a cache and a load balancer in front. The interviewer asks, "What happens when payments corrects an order from three days ago?" and the candidate has no answer. What went wrong, and what should the first two minutes have sounded like?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 The candidate prepared for a software engineering round (serving requests quickly) instead of a data engineering round (moving and shaping data so consumers can trust it). Nothing in the design was built to change numbers that had already been published, because the candidate never asked who reads the dashboard, how fresh it must be, or whether published numbers can change.
@@ -29,7 +29,7 @@ A candidate with strong knowledge thinks silently for four minutes at a stretch.
 - C. Several dimensions at once, including breadth and depth
 - D. None, as long as the final diagram is correct
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** Communication is scored on every dimension. The interviewer cannot see breadth, depth or trade-off reasoning that happens in your head, so silence costs you on all of them at once.
@@ -43,7 +43,7 @@ Covered in [How Data Engineering Design Interviews Work](01-how-interviews-work.
 
 You have a 50-minute round. At minute 27 you finish the architecture diagram and realize you have not touched the data model, the pipeline, or monitoring. What do you do?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Compress what is left instead of finishing anything perfectly. An 80% architecture plus a model, a pipeline and a monitoring step beats a polished architecture and nothing else. Say it aloud: "I'm at the halfway mark, so I'll move to the data model and keep each remaining step short."
@@ -64,7 +64,7 @@ In most data prompts the framework puts the data model (step 4) after the archit
 - C. The architecture determines the cloud vendor, which determines the schema syntax
 - D. Table design is not part of a data engineering round
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **B.** A data system has a raw layer (one row per event as received), a cleaned layer (deduplicated and typed) and a serving layer (shaped for a consumer, for example one city per five-minute window). Each has its own grain, key and partitioning, and each only makes sense once it is on the board. If you model first, you tend to design one table that tries to be all three.
@@ -78,7 +78,7 @@ Covered in [The Delivery Framework](02-delivery-framework.md), with the modeling
 
 The interviewer, playing a marketing stakeholder, says the campaign dashboard must be "real time". How do you respond, and what does your answer change in the design?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Ask what decision is made with the number and how soon they act on it: "When someone sees a campaign underperforming, what do they do, and how quickly?" "Real time" is a word, not a requirement. If the answer is "we check campaigns after lunch", the real requirement is hourly freshness. A courier-dispatch screen that reroutes drivers, by contrast, really does need seconds.
@@ -94,7 +94,7 @@ Covered in [Requirements Gathering](03-requirements-gathering.md).
 
 Finance wants two years of payments history. You will load it from the payments provider's pull API, which allows 100 requests a minute with up to 100 records each. The company has 300,000 payments a day. Roughly how long does the backfill take, and what do you propose?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Two years is 730 days at 300,000 records a day, about 219 million records. At 100 requests a minute with 100 records each you read 10,000 records a minute, or 14.4 million a day. That is about **15 days** of continuous pulling, and it competes with the daily sync for the same quota.
@@ -115,7 +115,7 @@ In the meal-kit design, app events peak at about 3.5 MB/s and the total is about
 - C. The 15-minute freshness requirement, which needs continuous delivery with replay if a job fails
 - D. The two-year retention requirement
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** The volume is small. 3.5 MB/s is well under the roughly 10 MB/s planning figure for a single Kafka partition, and 33 GB a day takes a small machine under an hour. Volume does not force the log. Freshness does: orders must arrive continuously instead of nightly, and a log lets a failed job resume where it stopped.
@@ -129,7 +129,7 @@ Covered in [Sources and Volume](04-sources-and-volume.md) and [High-Level Archit
 
 Ops needs orders from the production orders database within 15 minutes, about 30 row changes a second, and the orders table is about 200 GB. Compare querying production on a schedule, an incremental extract, and CDC. Which do you pick for ops alone, and what would make you change your mind?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **Bad: query production directly** (`SELECT *` every 10 minutes). Reading 200 GB at 100 MB/s takes about 35 minutes, so a run never finishes inside its interval. It also competes with customers placing orders, and it keeps no history.
@@ -147,7 +147,7 @@ Covered in [High-Level Architecture](05-high-level-architecture.md); CDC itself 
 
 A customer dimension is updated in place when a customer moves from Leeds to Bristol in March. In January, finance asks for last year's revenue by city, and Leeds revenue has quietly moved to Bristol. What is the fix, and how do you decide which columns it applies to?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 The dimension was handled as a **Type 1** (overwrite) change, which loses history. Use **Type 2** for the city: close the old row with an end date and insert a new row for the new value, each version with its own surrogate key. Orders placed before the move carry the old key and report Leeds; later orders carry the new key and report Bristol. Finance's question then needs no special query.
@@ -168,7 +168,7 @@ A table has one row per order line. It also carries `order_total`, which repeats
 - C. Roughly a quarter of the correct revenue
 - D. It depends on the partition key
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **B.** Each order's total is repeated once per line, so it is summed about four times. This is the mixed-grain mistake: an order-level measure sitting beside line-level columns. With 300,000 orders and about 1.2 million lines a day, the dashboard adds up 1.2 million order totals instead of 300,000.
@@ -182,7 +182,7 @@ Covered in [Data Model Design](06-data-model-design.md).
 
 The nightly finance job inserts 300,000 order rows into the revenue table. It crashes after writing 200,000. The orchestrator retries it automatically. A candidate says this is handled. Is it, and what do you change?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Not as described. If the job appends with a plain `INSERT`, the retry starts from the top and writes all 300,000 again. The table now holds 500,000 rows, 167% of the truth, and nobody is alerted. A retry is only safe because of the write pattern underneath.
@@ -198,7 +198,7 @@ Covered in [Pipeline Design](07-pipeline-design.md).
 
 The finance job is scheduled for 2:00 a.m. The payments pull was late tonight. The job ran at 2:00 against partial payments and reported success. How do you redesign the scheduling?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Trigger on data, not only on time. Model the pipeline as a DAG where the reconciliation task depends on both the orders partition and the payments partition for the date. A sensor (or an event emitted when upstream finishes) lets the task run when its inputs are really there. Keep the clock only as the earliest start time.
@@ -221,7 +221,7 @@ You have finished the meal-kit design. Events average 700 a second and peak at 7
 - C. "Finance. Revenue must match payments to the cent and refunds arrive after day-close, so I'd like to cover how corrections flow in and how we reconcile. Or is there another area you'd rather see?"
 - D. "Nothing stands out. I covered the requirements."
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** Pick the dive from your own requirements and volume math. "Exact to the cent" makes correctness a certain dive, refunds make late data one too, and the small volume makes scale a one-sentence mention. C gives a reason, names two topics, and hands the interviewer a way to redirect.
@@ -235,7 +235,7 @@ Covered in [Deep Dives](08-deep-dives.md).
 
 The nightly job started at 02:00, ran for 40 seconds and reported success. At 09:00 finance finds Monday's revenue table empty. The payments extract returned zero rows because of an expired credential, and the table was rebuilt from nothing. Your monitoring alerted on job failures only. What monitoring would have caught it, and what should the pipeline have done?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 The monitoring watched the pipeline (did the job run?) instead of the data. Measure the data against a reference:
@@ -257,7 +257,7 @@ Covered in [Monitoring and SLAs](09-monitoring-and-slas.md).
 
 A candidate answers a practice prompt: "I'd use Kafka and Spark Streaming into Snowflake, because it needs to be real time. If a job fails, Airflow retries it. We'd add monitoring with Grafana." Name the mistakes you can spot, and give a one-line fix for each.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 At least four of the 15 patterns appear:

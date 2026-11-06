@@ -1,2 +1,6 @@
 # Local list of names banned from the course (never commit)
 .forbidden-terms
+
+# Zensical build output and the uv virtualenv
+site/
+.venv/

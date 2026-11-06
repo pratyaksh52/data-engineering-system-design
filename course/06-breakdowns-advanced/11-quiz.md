@@ -8,7 +8,7 @@ Fifteen questions on the ten advanced breakdowns: where a design bends, what bre
 
 A music service pays royalties on a 5-billion-plays-a-day ledger. A phone on a train uploads 40 plays, loses the response, and uploads the same batch again three days later. A teammate says, "Our stream processor is exactly-once, so we're covered." Is the label paid once? How do you make it so without scanning seven years of plays?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Not necessarily. Exactly-once covers a job's own retries and restarts. Here there are two different messages in the log, written three days apart by a client retry. Only the `play_id` knows they are the same play.
@@ -24,7 +24,7 @@ Covered in [Music Streaming Analytics](01-music-streaming-analytics.md).
 
 A video service shows about 40 billion impressions a day. You want to log every feature the ranking model saw, so training matches serving. By value, that is about 120 TB a day. Finance balks. Someone proposes logging features for a 5% sample of pages. What do you do instead, and what rule keeps it safe?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Sampling cuts storage 20x but leaves 95% of impressions without features. You either train on 5% of your labels or reconstruct the rest, which brings back training-serving skew.
@@ -40,7 +40,7 @@ Covered in [Video Recommendations](02-video-recommendations.md).
 
 Your fraud service must answer in 100 ms. On a sale day the online feature store's p99 rises to 80 ms. Do you approve or decline, and what do you design so that this is a decision you made rather than one that happened to you?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 "Wait for every feature" is the bad answer: the fetch plus the 30 ms model blows the budget, the authorization service times out, and it applies a default that nobody on your team chose.
@@ -56,7 +56,7 @@ Covered in [Fraud Detection](03-fraud-detection.md).
 
 A celebrity post gets 40,000 likes and 200,000 views a second. The count job is already pre-aggregating, so the counter store gets one write a second. But reads of that one key land on one shard. A teammate says, "Salt the counter key into 8 sub-keys." Respond.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Salting is the wrong tool. It splits a key so that writes spread across shards, but every read must then fetch all 8 sub-keys and add them, so a read-heavy key gets 8 times worse. Here the stream job has already turned 40,000 writes into one, so there is no write hot spot to fix; the load is reads. Adding replicas multiplies the cost of the whole cluster for one key and makes the count jump between asynchronous replicas.
@@ -72,7 +72,7 @@ Covered in [Social Media Analytics](04-social-media-analytics.md).
 
 At 10am one customer's analyst runs a 13-month funnel through your analytics SQL interface and every other tenant's dashboards slow down. Someone says to autoscale the query pool. What is your design?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Autoscaling alone hides the problem by paying for it. The pool grows to fit the noisiest tenant, and the bill lands on everyone's margin. Limits per tenant come first; scaling is for aggregate growth.
@@ -88,7 +88,7 @@ Covered in [Multi-Tenant Platform](05-multi-tenant-platform.md).
 
 A shopper adds a tent to the cart and reaches the cart page 400 ms later. The "complete your trip" row sometimes doesn't know about the tent, because the stream job hasn't updated the session store yet. Compare having the cart service write the session store synchronously with something else, and say which you'd ship.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Accepting stream lag ("p95 is 2 seconds") fails the promise: the next page often arrives in under a second.
@@ -104,7 +104,7 @@ Covered in [Recommendation Engine](06-recommendation-engine.md).
 
 The ranking team wants a new affinity signal: decayed weights, comments worth more than views. A teammate proposes editing the job and letting tomorrow's run overwrite the old values. What goes wrong, and how do you ship it so an A/B test can run?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Overwriting breaks the live model, which was trained on 90-day counts and now reads decayed scores on a different scale, so feed quality drops overnight. The new model has no history to train on, and the A/B test is impossible because only one version exists. This is training-serving skew, and it fails silently.
@@ -124,7 +124,7 @@ Covered in [Activity Feed](07-activity-feed.md).
 
 Your ad platform invoiced October on November 2. On November 12 the invalid-traffic team flags 400,000 clicks across October and November. One campaign capped at $300 had $318 of valid clicks on November 4, so $18 was marked `over_budget`. After the $40 credit, someone suggests billing the $18 to fill the freed budget. What do you do?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Do not re-settle the day. That would send the advertiser a credit and a new charge for the same day, weeks later, for clicks they were told were free, and every IVT sweep would reopen every capped day it touched.
@@ -140,7 +140,7 @@ Covered in [Ad Clickstream](08-ad-clickstream.md).
 
 The bookings domain wants to change a hub data product from one row per booking to one row per room-night. 140 pipelines in 18 domains read it. A teammate suggests announcing the change date in a channel. Walk through what you'd actually build.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 A grain change is breaking under every compatibility mode: the same column names now mean something different. Announcing a date means half the consumers miss it, and revenue silently doubles for multi-night stays.
@@ -156,7 +156,7 @@ Covered in [Data Mesh Platform](09-data-mesh-platform.md).
 
 A regional cellular outage ends after 6 hours and 300,000 refrigerated trucks reconnect in the same minute, each holding 2,160 buffered readings. Firmware retries on a fixed timer and uploads at full speed. What happens, and what do you change?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 About 130 GB arrives (300,000 × 2,160 × 200 bytes). In 5 minutes that is roughly 430 MB/s on top of the normal 100 MB/s, plus 300,000 TLS handshakes in seconds. Brokers reject connections, rejected devices retry in lockstep, and when they get through, live readings queue behind six hours of backlog. Dashboards go stale exactly when operations needs to know if cargo is safe.
@@ -177,7 +177,7 @@ A music service's October statement went out on November 5. On November 20, a li
 - C. Give each ledger row a posting period (its play month if open, else the earliest open month), post late plays as adjustments and fraud as negative rows in the open period
 - D. Overwrite the plays table and re-run the old statement
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** The 300 October plays keep `play_date` in October but post to November with a `late_adjustments` count. The bot streams become `fraud_reversal` rows with `quantity = -1` in the open period, with an anti-join so a fraud feed delivered twice reverses once. Closed statements never change, and the ledger shows exactly what happened and when. With the close on the 5th and 99.95% of plays arriving within 4 days, nearly every play lands on its own month's statement.
@@ -198,7 +198,7 @@ The embedding team retrains title embeddings every week. The morning after, ever
 - C. Version the embedding snapshot and record the ID on each model
 - D. Freeze the embeddings and retrain them once a year
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **B.** An embedding only has meaning relative to the run that produced it, so retraining reshuffles the space and a model served new vectors is reading a language it never learned. Features built from embeddings, such as a profile's taste vector, inherit the problem. The profile feature is named per version (`profile_taste_e42`), and both `e41` and `e42` are materialized during the overlap. A new version goes live only when a model retrained on it is promoted together with its features. Lineage deletes old versions only when no live bundle references them.
@@ -217,7 +217,7 @@ A multi-tenant analytics platform has row-level security on every pooled table. 
 - C. Add more canary tenants and alert when they see each other
 - D. Key the dashboard cache by tenant (and likewise query logs, error messages and support tooling), enforced by the query service
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **D.** If the cache keys only on SQL text, the second tenant gets the first one's cached result. The leak never touches a table, so table-level controls cannot see it. The same applies to logs, error messages and support tools. Tenant identity should come from the authenticated session, which the user can't change, and be part of every cache key.
@@ -237,7 +237,7 @@ A store gets 55,000 recommendation requests a second, each with about 1,000 cand
 - C. Filter out-of-stock items when the nightly lists and index are built
 - D. Cache stock per replica for 10 minutes
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **A.** Recommendations need one bit per SKU (in stock, listed, not blocked), not "how many left". 30 million bits is under 4 MB per replica, filtering 1,000 candidates is microseconds, and the compacted topic keeps only the latest value per SKU, so it is a complete current table. A replica restarts from a bitmap snapshot plus a replay from its topic offset. Use a safety threshold (unavailable below 5 units, not 0), because stock falls faster than any pipeline propagates. End-to-end is a few seconds. Say the trade-off: eventually right within seconds, and checkout still checks real stock.
@@ -256,7 +256,7 @@ Sensors write 5-minute summaries. Product now wants hourly p95 temperature. Whic
 - C. Store a small quantile sketch per bucket (a t-digest or KLL) and merge the twelve
 - D. Keep only raw readings and never summarize
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** Percentiles are not mergeable: twelve 5-minute p95s don't make an hourly p95. A sketch of a few hundred bytes answers the question approximately and merges. The cost is real: at 1.44 billion 5-minute rows a day and 300 bytes each, it is about 430 GB a day, so add it only for metrics someone asked for.

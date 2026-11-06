@@ -8,7 +8,7 @@ Fifteen questions on partitioning, ingestion, backfills, lineage, cost, monitori
 
 A clickstream pipeline lands 200 GB a day of Parquet from 5,000 tenants. Support runs "yesterday's events for tenant 4127" all day, so a teammate proposes partitioning by date, hour and tenant. Another proposes date and tenant. Which do you pick, or what do you propose instead, and what is the arithmetic?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Propose **date-only partitioning, with the table clustered by `tenant_id` inside each day.**
@@ -31,7 +31,7 @@ Events flow through Kafka keyed by `tenant_id`. Peak ingest is 35 MB/s and one t
 - C. Salt that tenant's key into 8 sub-keys, and have readers combine the 8 slices
 - D. Raise the consumer's memory so one consumer can keep up
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** The big tenant sends 0.4 x 35 = 14 MB/s, above the roughly 10 MB/s planning figure for one partition. Salting (appending something like `hash(event_id) % 8` to the key) spreads that tenant over up to 8 partitions at about 1.75 MB/s each. The cost is on the read side: a query for that tenant reads 8 slices and merges them, aggregates become two-step (partial sums, then a final sum), and order is lost across the salts. Salt only the known giant keys.
@@ -45,7 +45,7 @@ Covered in [Partitioning](01-partitioning.md).
 
 The nightly job copies new and changed orders from Postgres with `WHERE updated_at > :last_watermark`. Finance reports two problems: cancelled orders are still in the warehouse, and about one order in a thousand is missing. Explain both and fix both.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 These are two of the standard gaps of a watermark load.
@@ -65,7 +65,7 @@ Covered in [Ingestion Patterns](02-ingestion-patterns.md).
 
 A courier partner drops a daily CSV on an SFTP server, usually by 05:00. Last week your job loaded a file at 04:58 while it was still being written, and on Friday the partner re-sent Thursday's file under a new name. Nobody noticed either until a finance review. What do you change?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Files need four parts, and each answers one of the failures.
@@ -86,7 +86,7 @@ Covered in [Ingestion Patterns](02-ingestion-patterns.md).
 
 A currency-conversion bug has produced wrong `fact_revenue` rows for 45 days. The fix is a ten-minute code change. Kafka keeps 3 days of data, the payments API cannot return history, and about 1 TB of raw JSON landed each day. Walk through how you correct the data.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 1. **Rerun safely.** Every job takes its date as a parameter and overwrites that date's partition, so the backfill is the same job run for 45 dates. If the job appends, make it idempotent first, or the rerun duplicates rows.
@@ -109,7 +109,7 @@ A daily job joins orders to the `customers` table and reads each customer's curr
 - C. The raw layer was compressed with the wrong codec
 - D. The backfill ran too many dates in parallel
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **A.** A job that reads "now" or "the current dimension row" produces today's answer for a past date. A backfill is reproducible only if every input is pinned to the run's date. Where the answer depends on how a dimension looked back then, read it as of that date (a Type 2 dimension with validity dates makes this possible).
@@ -123,7 +123,7 @@ Covered in [Backfill and Reprocessing](03-backfill-and-reprocessing.md).
 
 The orders team wants to rename `orders.amount` to `orders.amount_gross`. You have table-level lineage showing 14 tables that read `orders`, and several of them are built with Spark jobs. The team asks whether that is enough to proceed. What do you tell them?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Table-level lineage says 14 tables read `orders`, so you would ask 14 teams whether they use `amount`. **Column-level lineage** answers the real question: it might show that only 3 tables use that column, so you talk to 3 teams. For a rename, this is where column level earns its cost.
@@ -141,7 +141,7 @@ Covered in [Data Lineage](04-data-lineage.md), with the change workflow in [Data
 
 A dashboard refreshes every 15 minutes and scans the whole 30-day events table (6 TB of Parquet) on a scan-priced engine at about $5 per TB. Finance asks you to cut the bill. A colleague suggests moving old data to a cheaper storage tier. What do you do first?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Find the biggest line before choosing a lever. At 6 TB a run, the dashboard costs about $30 per run, 96 runs a day, roughly $2,900 a day. Storing the 6 TB costs only about $140 a month, so tiering it saves almost nothing.
@@ -163,7 +163,7 @@ Covered in [Cost Optimization](05-cost-optimization.md), with pruning in [Partit
 
 An on-call engineer is woken 41 times in 13 minutes: failed tasks that succeeded on retry, 12 stale-table alerts from one late extract, and one zero-row payments extract. The finance table is due at 07:00, the extract normally finishes by 03:00 and the transform takes 90 minutes. What do you change?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Page on the **SLA at risk**, not on failures. Treat 07:00 as a budget: with the extract done at 03:00 and a 90-minute transform, the table is ready by about 04:30, leaving 2.5 hours of slack. A task that fails at 02:05 and retries successfully costs 10 minutes of slack and wakes nobody. If at 05:00 the extract has still produced nothing, only 2 hours remain against a 90-minute transform, so page now, while there is time to fix it. A failure-based rule pages at 02:05 for something that heals, and may stay silent at 05:00 because no task has "failed".
@@ -190,7 +190,7 @@ Your volume check alerts if today's rows are more than 20 percent below or 30 pe
 - C. The alert fires, because the check compares with Sunday, which had fewer orders
 - D. No alert, because volume checks only look for zero rows
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **B.** The average is 299,000, so the lower bound is about 239,000 and the upper bound about 389,000. A count of 250,000 is 16 percent below the average and passes, while a real failure like 4,000 rows trips the check by a mile. The tolerance is wider than ordinary variation (the four Mondays sit within about 4 percent of their average) and narrow enough to catch real problems.
@@ -204,7 +204,7 @@ Covered in [Monitoring and Alerting](06-monitoring-and-alerting.md).
 
 The orders team changes the `total` field from dollars to cents. The name and type stay the same. The schema registry accepts the change, every check goes green, and the board metric is 100 times too high on Friday. What failed, and what would have stopped it?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 A registry checks **structure, not meaning**. A rename or retype is rejected in every compatibility mode, but a unit change on an unchanged field passes all of them. The deeper cause is that the agreement between producer and consumers existed only in people's heads.
@@ -232,7 +232,7 @@ A Kafka topic holds events written under schema versions 1, 2 and 3. A new consu
 - C. NONE is fine, because consumers can ignore fields they do not understand
 - D. BACKWARD_TRANSITIVE is needed, because version 3 must be able to read version 1 data too
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **D.** BACKWARD means readers on the **new** schema can read data written with the **previous** one. Non-transitive modes compare a new version only with the latest, so v3 may be compatible with v2 and v2 with v1 while v3 cannot read v1. A consumer replaying from offset 0 meets all three versions, so the check must run against all earlier versions: BACKWARD_TRANSITIVE. The same applies to a warehouse table holding years of data written under old versions.
@@ -246,7 +246,7 @@ Covered in [Data Contracts](07-data-contracts.md).
 
 A food-delivery app shows orders per hour on a live dashboard, and finance reads a daily warehouse table. You measured event lateness: p50 1 second, p95 20 seconds, p99 8 minutes, p99.9 3 hours. How do you set the watermark and handle the rest?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Aggregate by **event time**, because the business question is when the order happened, and store both `event_time` and `ingested_at` so lateness stays measurable.
@@ -270,7 +270,7 @@ Covered in [Late-Arriving Data](08-late-arriving-data.md).
 
 A team proposes deduplicating 1 billion events a day inside the stream job by remembering every event ID forever. A measurement of one day of raw data shows 99.9 percent of duplicates arrive within 30 minutes of the first copy. What do you propose, with numbers?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Windowed streaming dedup plus batch dedup as the guarantee.
@@ -299,7 +299,7 @@ A stream job reads from Kafka and appends rows to a warehouse table. It crashes 
 - C. Write with an upsert (`MERGE`) keyed by the event ID
 - D. Add a Bloom filter in front of the sink
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** Delivery is at-least-once: the network cannot tell a lost message from a lost acknowledgement, so a reliable system resends when unsure. What you can have is an exactly-once **effect**, built from at-least-once delivery plus an idempotent write. With an upsert on the event ID, replayed events land on the same rows, so delivery happened twice and the effect happened once. Name the hop and the key.

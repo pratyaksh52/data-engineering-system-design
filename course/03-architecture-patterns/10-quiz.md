@@ -8,7 +8,7 @@ Fourteen questions on Lambda, Kappa, medallion, CDC, event sourcing, data mesh, 
 
 A food-delivery app produces about 500 million events a day. City operations want orders per city per minute within 30 seconds, and a small error is fine. Finance wants yesterday's revenue exact to the cent by 06:00. The interviewer asks, "So, Lambda?" What do you say?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Not yet. Split the requirement by consumer first: ops has a speed contract, finance has a correctness contract. Then test the simpler options out loud. If the stream job can be exact (event-time windows, idempotent writes), run one stream job and fix history by replay. If ops would accept five minutes, one micro-batch job meets both contracts with one codebase.
@@ -29,7 +29,7 @@ In a Lambda system, the serving layer shows revenue per city per minute. The bat
 - C. Use the speed view everywhere, and keep the batch view only as a backup
 - D. Use whichever view has the larger number, since the other missed events
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **B.** Each time range comes from exactly one layer. Before the cutoff the batch view is complete and exact. After it, only the speed layer has data. When the nightly result lands, it replaces the speed layer's copy of that day, which is then discarded.
@@ -45,7 +45,7 @@ Covered in [Lambda Architecture](01-lambda-architecture.md).
 
 A ride-hailing pipeline runs one stream job (Kappa style) on a Kafka topic that keeps 3 days. The team finds the job has counted trips cancelled within 10 seconds as completed for 11 days. How do you fix the data? You decide to recompute the last 30 days, which is 30 TB. How long will that take?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 The log no longer holds the first 8 days, so "just replay Kafka" fails. Replay from a second source: either tiered storage on the log, or the raw copy in object storage that a sink writes anyway. Reading the raw copy through a source connector lets the same job logic run, so you keep one codebase.
@@ -68,7 +68,7 @@ After a Kappa replay finishes, the new table matches the old one for most days. 
 - C. Log compaction removed some trips
 - D. The live job enriched each trip with the driver's rating at that moment by calling a service, and the replay used today's rating
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **D.** Kappa needs a deterministic job. If the live job called an external service or read "current" reference data, a replay a month later reads different values, so history changes without any bug. Fix it by keeping reference data versioned and joining by event time, or accept that the replay is a new interpretation of history.
@@ -84,7 +84,7 @@ Covered in [Kappa Architecture](02-kappa-architecture.md).
 
 An online shop lands 1 TB a day of JSON. A silver job converted timezone offsets wrongly, so about 2% of orders landed on the wrong day. It was found after 14 days. Bronze keeps raw files for 7 days. What do you do now, and what do you change?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Fix the conversion, then rerun silver for the affected dates from bronze as idempotent partition overwrites, then rerun every gold table downstream (lineage tells you which). Consumers keep reading the old gold tables until the rebuilt ones are verified.
@@ -105,7 +105,7 @@ Finance defines "net revenue" as gross minus refunds. Growth wants gross orders.
 - C. Everything in silver so there is one trusted table
 - D. Deduplication in bronze so bronze is clean
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **B.** The rule is to push shared work down and opinionated work up. Everyone needs deduplication, so silver does it once. Net revenue is a business definition two teams disagree on, so it lives in gold, once per team. Masking happens in silver, and bronze holds the raw value, so lock its access down.
@@ -119,7 +119,7 @@ Covered in [Medallion Architecture](03-medallion-architecture.md).
 
 The analytics team copies a Postgres `orders` table (20 million rows, 200 writes a second) into the warehouse with `WHERE updated_at > :last_run` every minute. Finance reports that cancelled orders are still counted as revenue. Explain the bug and redesign the pipeline, including how it starts.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 A hard-deleted row has no `updated_at` to find, so the poll never sees the delete. The same poll also collapses intermediate states (`placed`, `packed`, `shipped` inside one minute) and queries the primary that serves checkout. The poll sees current state, but you need the history of changes.
@@ -137,7 +137,7 @@ Covered in [CDC Patterns](04-cdc-patterns.md).
 
 An order service must save an order row and publish an `OrderPlaced` message to Kafka. The current code saves to Postgres, then publishes. Sometimes downstream systems never hear about an order. Swapping the order does not help either. Why, and what is the fix?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 This is a dual write: two systems, no shared transaction, so no ordering is safe. Save then publish: a crash in between leaves an order with no event. Publish then save: a rollback leaves an event for an order that does not exist.
@@ -155,7 +155,7 @@ Covered in [CDC Patterns](04-cdc-patterns.md#the-outbox-pattern).
 
 A payments app stores wallet events (`ToppedUp`, `PaymentMade`, `PaymentRefunded`, `FeeCharged`) as the source of truth. A candidate says, "So it's CDC with nicer event names." A customer asks why their balance is 40.00 and not 90.00. Correct the candidate and explain how the events answer the customer.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 The difference is the source of truth. CDC reconstructs events from state: the table is the truth, and the log tells you a row went from 90 to 40, with no reason. Event sourcing derives state from events: the event log is the truth, events are written deliberately with business names and intent, and the balance is a projection you can throw away and rebuild. Test: if you can delete the log and lose nothing, it is not event sourcing.
@@ -171,7 +171,7 @@ Covered in [Event Sourcing](05-event-sourcing.md).
 
 A startup with 25 employees, three product teams and one data engineer asks you to design its data platform. The CTO has read about data mesh and wants it. What do you say?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Ask the diagnostic questions first: how many domain teams produce data, is the central team a bottleneck, and can domains staff data ownership? Here the answers are three, no queue and one data engineer, so mesh is overkill. It is an organisational change that needs roughly 10 or more domains, a long central queue, domains with data skills, and a platform team of several engineers.
@@ -194,7 +194,7 @@ A retailer's analysts spend two days finding which of five systems hold the data
 - C. Take the catalog, automated lineage and central policy, with owners attached. Use federation for exploration and light joins, and materialise heavy or repeated joins into the warehouse
 - D. Build a data mesh instead, since fabric and mesh are alternatives
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** The useful parts are a catalog covering all systems, automatically captured metadata and policy defined once. Build the catalog first, with owners on every entry; it is cheap, it helps immediately, and it exposes which datasets nobody owns.
@@ -208,7 +208,7 @@ Covered in [Data Fabric](07-data-fabric.md), with the contrast in [Data Mesh](06
 
 A product manager says the orders-per-minute dashboard for a retailer "must be real time". It carries 1 billion events a day. Operations glance at it during sales and phone a warehouse if a region spikes. Which processing model do you pick, and roughly what does it cost compared with an always-on stream?
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 First turn "real time" into a number: ask what a person does with it and what happens if it is two minutes late. A human glancing at a screen does not need sub-second updates, so a freshness target of a few minutes to 15 is realistic. That points to micro-batch: a Spark Structured Streaming job with a fixed 5-minute trigger, or an available-now trigger every 10 to 15 minutes, with a checkpoint on object storage. Reserve record-at-a-time streaming (Flink) for cases where an action must follow a single event, such as a fraud block at checkout.
@@ -231,7 +231,7 @@ To make a lake-table dashboard "fresher", an engineer sets a Spark micro-batch t
 - C. Tens of thousands of tiny files a day, slower reads and a need for compaction
 - D. Exactly-once guarantees are lost, because the batches are too small
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 **C.** At about 2.4 MB per cycle, a 1-second trigger writes at least 86,400 files a day, against a target of 128 MB to 1 GB per file. Readers slow down, request costs climb, and every commit adds table metadata. A 5-minute trigger writes about 720 MB per cycle and the problem largely disappears. Treat a trigger under about a minute on a lake table as a smell: either the freshness is not that tight, or the sink should be a store built for small fast writes.
@@ -245,7 +245,7 @@ Covered in [Micro-Batch vs Streaming](08-micro-batch-vs-streaming.md).
 
 A subscription company has an `account_health` table (40,000 accounts) rebuilt nightly. Customer success managers want the score on the CRM account page and a task created when `churn_risk` flips to true. The CRM allows 100 requests a minute, 10 records per request. Design the sync and say what would make it break.
 
-<details>
+<details markdown="1">
 <summary>Answer</summary>
 
 Use reverse ETL: read the model, diff against the last synced rows, map columns to CRM fields, write only changed rows in batches, record successes and failures. Upsert by the CRM's own account ID, not an email people can edit. For accounts that leave the model, set an inactive flag instead of deleting history.

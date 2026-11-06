@@ -11,10 +11,12 @@ import re
 import subprocess
 import sys
 import tempfile
+import tomllib
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 COURSE_ROOT = REPO_ROOT / "course"
+SITE_CONFIG = REPO_ROOT / "zensical.toml"
 MERMAID_CLI = "@mermaid-js/mermaid-cli@11.4.0"
 
 REQUIRED_HEADINGS = {
@@ -42,12 +44,13 @@ LINK_RE = re.compile(r"!?\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+(?:\"[^\"]*\"|'[^']*
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})\s*([^\s`]*)")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 QUIZ_Q_RE = re.compile(r"^###\s+Q\d+\.")
+DETAILS_RE = re.compile(r"<details\b([^>]*)>")
 
 
 def lesson_type(path: Path) -> str | None:
-    """Return concept | tech | breakdown | quiz, or None for README/GLOSSARY/other files."""
+    """Return concept | tech | breakdown | quiz, or None for index/README/GLOSSARY/other files."""
     path = Path(path)
-    if path.name.lower() in ("readme.md", "glossary.md"):
+    if path.name.lower() in ("index.md", "readme.md", "glossary.md"):
         return None
     m = re.match(r"^0([1-6])-", path.parent.name)
     if not m:
@@ -163,6 +166,45 @@ def check_links(p, rel, parsed, root, allow_planned, report):
                 report.warn(rel, n, f"link to planned lesson not yet written: {target}")
             else:
                 report.error(rel, n, "BROKEN_LINK", f"link target not found: {target}")
+
+
+def check_details(rel, parsed, report):
+    """The site renders markdown inside <details> only when the tag carries markdown="1"."""
+    for n, line, in_fence, _ in parsed:
+        if in_fence:
+            continue
+        for m in DETAILS_RE.finditer(re.sub(r"`[^`]*`", "", line)):
+            if not re.search(r"""\bmarkdown\s*=\s*["']1["']""", m.group(1)):
+                report.error(rel, n, "DETAILS_MARKDOWN", 'use <details markdown="1"> so the site renders the answer as markdown')
+
+
+def nav_pages(nav) -> list[str]:
+    out = []
+    for item in nav:
+        if isinstance(item, str):
+            out.append(item)
+        elif isinstance(item, dict):
+            for v in item.values():
+                out.extend(nav_pages(v) if isinstance(v, list) else [v])
+        elif isinstance(item, list):
+            out.extend(nav_pages(item))
+    return out
+
+
+def check_nav(config: Path, root: Path, report: Report) -> None:
+    """Every markdown page under the course root appears in the site sidebar, and every sidebar entry exists."""
+    rel = display(config, REPO_ROOT)
+    try:
+        nav = tomllib.loads(config.read_text(encoding="utf-8"))["project"]["nav"]
+    except (OSError, KeyError, tomllib.TOMLDecodeError) as e:
+        report.error(rel, 0, "NAV", f"cannot read project.nav: {e}")
+        return
+    listed = nav_pages(nav)
+    pages = {p.relative_to(root).as_posix() for p in root.rglob("*.md")}
+    for page in sorted(pages - set(listed)):
+        report.error(rel, 0, "NAV", f"page missing from the sidebar nav: {page}")
+    for page in sorted(set(listed) - pages):
+        report.error(rel, 0, "NAV", f"nav entry points to a missing page: {page}")
 
 
 def check_structure(p, rel, ltype, parsed, text, report):
@@ -300,6 +342,7 @@ def main(argv=None) -> int:
             if any(pt.search(line) for pt in pats):
                 report.error(rel, n, "FORBIDDEN", "line matches a forbidden term")
         check_links(p, rel, parsed, root, args.allow_planned, report)
+        check_details(rel, parsed, report)
         try:
             lt = lesson_type(p.relative_to(root))
         except ValueError:
@@ -308,6 +351,9 @@ def main(argv=None) -> int:
             check_structure(p, rel, lt, parsed, text, report)
         if args.mermaid:
             check_mermaid(rel, parsed, report, state)
+
+    if not args.root and not args.paths:
+        check_nav(SITE_CONFIG, root, report)
 
     for line in report.lines:
         print(line)
