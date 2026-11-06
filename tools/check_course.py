@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Course checker: structure, link, forbidden-term and Mermaid checks for the markdown course.
 
-Usage: python3 tools/check_course.py [--mermaid] [--allow-planned] [--root DIR] [PATH ...]
+Usage: uv run tools/check_course.py [--mermaid] [--allow-planned] [--root DIR] [PATH ...]
 Exit 0 when there are no errors; otherwise exit 1 with one `path:line: CODE message` line per error.
 """
 from __future__ import annotations
@@ -14,6 +14,7 @@ import tempfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+COURSE_ROOT = REPO_ROOT / "course"
 MERMAID_CLI = "@mermaid-js/mermaid-cli@11.4.0"
 
 REQUIRED_HEADINGS = {
@@ -87,8 +88,7 @@ def parse_lines(text: str):
                 fence = None
 
 
-def load_forbidden(root: Path, report: Report):
-    f = root / ".forbidden-terms"
+def load_forbidden(f: Path, report: Report):
     if not f.is_file():
         report.error(".forbidden-terms", 0, "FORBIDDEN", ".forbidden-terms missing; cannot check forbidden terms")
         return []
@@ -278,13 +278,15 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--mermaid", action="store_true", help="render each ```mermaid block with mermaid-cli")
     ap.add_argument("--allow-planned", action="store_true", help="downgrade links to unwritten curriculum lessons to WARN")
-    ap.add_argument("--root", default=str(REPO_ROOT), help="repo root (default: parent of tools/)")
+    ap.add_argument("--root", help="course root (default: course/ next to tools/)")
     ap.add_argument("paths", nargs="*", metavar="PATH")
     args = ap.parse_args(argv)
-    root = Path(args.root).resolve()
+    # The terms file lives at the repo root (gitignored); with an explicit --root it is looked up there instead.
+    root = Path(args.root).resolve() if args.root else COURSE_ROOT
+    terms = root / ".forbidden-terms" if args.root else REPO_ROOT / ".forbidden-terms"
 
     report = Report()
-    pats = load_forbidden(root, report)
+    pats = load_forbidden(terms, report)
     state: dict = {}
     for p in collect_files(args.paths, root):
         rel = display(p, root)
