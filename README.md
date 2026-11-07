@@ -13,6 +13,7 @@ A self-study course for the data engineering system design interview: the 45 to 
 | `docs/` | Planning notes from when the course was written. Not part of the course. |
 | `zensical.toml` | Config for the website version of the course. |
 | `pyproject.toml` | Python dependencies, managed with uv. |
+| `justfile` | Shortcuts for serving, building and checking (see below). |
 
 ## Reading It as a Website
 
@@ -27,6 +28,20 @@ Then open <http://localhost:8000>. The page reloads as you edit lessons. To buil
 ```bash
 uv run zensical build
 ```
+
+## Shortcuts with just
+
+If you have [just](https://just.systems/) installed, these wrap the uv commands in this README:
+
+| Command | What it does |
+| --- | --- |
+| `just` | List all recipes. |
+| `just serve` (or `just run`) | Serve the site at <http://localhost:8000> with live reload. |
+| `just build` | Build static HTML into `site/`. |
+| `just check` | Run the course checker. |
+| `just test` | Run the checker's tests. |
+| `just ci` | Check, test, then build. |
+| `just clean` | Delete `site/`. |
 
 ## Checking the Course
 
