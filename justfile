@@ -13,6 +13,10 @@ run: serve
 build:
     @uv run zensical build
 
+# Build the site, then open the built copy in the default browser
+open: build
+    @uv run python -c "import pathlib, webbrowser; webbrowser.open(pathlib.Path('site/index.html').resolve().as_uri())"
+
 # Check lesson structure, links and the sidebar
 check:
     uv run tools/check_course.py
