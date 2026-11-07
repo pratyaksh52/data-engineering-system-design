@@ -4,7 +4,7 @@ default:
 
 # Serve the site locally with live reload (http://localhost:8000)
 serve:
-    @uv run zensical serve
+    @uv run zensical serve --open
 
 # Alias for serve
 run: serve
