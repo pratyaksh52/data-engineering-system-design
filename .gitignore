@@ -4,3 +4,7 @@
 # Zensical build output and the uv virtualenv
 site/
 .venv/
+
+# Python cache
+__pycache__/
+*.pyc
