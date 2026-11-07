@@ -6,6 +6,7 @@ site_name = "Data Engineering System Design"
 site_description = "A self-study course for the data engineering system design interview."
 docs_dir = "course"
 site_dir = "site"
+use_directory_urls = false                  # links end in .html so the built site also works opened from disk (file://)
 extra_css = ["stylesheets/extra.css"]       # site-only styling; lessons stay plain GitHub markdown
 nav = [
   { "Home" = "index.md" },
